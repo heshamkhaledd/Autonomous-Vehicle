@@ -1,31 +1,30 @@
-/*
- * UART_TASK.c
+ /******************************************************************************
  *
- *  Created on: 8 Oct 2019
- *      Author: okasha
- */
-
+ * File Name:   UART_TASK.c
+ *
+ * Description: UART source file to initialize UART module tasks
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 #include "UART_TASK.h"
 
 
 
-/********************************************************************
- *                          Variables
- ********************************************************************/
-
-
-/*****************************************************************
- *                       Semaphores
- *****************************************************************/
-
-
+/* Declare Semaphore Handle for UART task */
 SemaphoreHandle_t Sem_UARTReceive;
 
 
-/********************************************************************
- *                        Private Functions
- ********************************************************************/
-
+/******************************************************************************
+ *
+ * Function Name: f_UART_Decoding
+ *
+ * Description: Responsible for converting UART Feedback data from ASCII to Decimal
+ *
+ * Arguments:   char UART_Received_Char , float Decoded_Data  , long point_flag
+ * Return:      float Decoded_Data
+ *
+ *****************************************************************************/
 static float f_UART_Decoding (char UART_Received_Char , float Decoded_Data  , long point_flag)
 {
     static long counter = 0 ;
@@ -48,42 +47,48 @@ static float f_UART_Decoding (char UART_Received_Char , float Decoded_Data  , lo
 }
 
 
-
-
-/********************************************************************
- *                        Public Functions
- ********************************************************************/
-
-
-
-void vInit_UART()
+/******************************************************************************
+ *
+ * Function Name: vInit_UART
+ *
+ * Description: Function to create the UART task semaphore and UART Feedback Task
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
+void vInit_UART(void)
 {
+    /* Create UART Task Semaphore and store its address in Sem_UARTReceive */
+    Sem_UARTReceive= xSemaphoreCreateBinary();
 
-    Sem_UARTReceive=xSemaphoreCreateBinary();
-
-
-    xTaskCreate( vTask_UART ,
-                 "UART_task" ,                       // Name of the task for later debugging
-                 UART_STACK_DEPTH ,                  // size of the stack.
-                 NULL ,                      // task parameters.
-                 configMAX_PRIORITIES-UART_vTASK_PRIO ,  // priority is inverted in freeRTOS.
-                 NULL ) ;            // handle of the task.
-
-
+    xTaskCreate( vTask_UART,                            /* Task Address       */
+                 "UART_task",                           /* Task name          */
+                 UART_STACK_DEPTH,                      /* Size of the stack. */
+                 NULL,                                  /* Task Parameters.   */
+                 configMAX_PRIORITIES-UART_vTASK_PRIO,  /* Task Priority .    */
+                 NULL);                                 /* Task handle        */
 }
 
 
-
-
-void vTask_UART(void * param)
+/******************************************************************************
+ *
+ * Function Name: vInit_UART
+ *
+ * Description: UART Task that's responsible for receiving the Orientation data
+ *              decode it, and push it to the appropriate queue.
+ *
+ * Arguments:   void *pvParameters
+ * Return:      void
+ *
+ *****************************************************************************/
+void vTask_UART(void *pvParameters)
 {
     char UART_Received_Char = 0 ;
     signed long Received_Data = 0;
     float f_Orientation = 0 ;
     static long point_flag  = 0 ;
     static signed long sign_flag = 1 ;
-    /* Inspect the high water mark of the calling task when the task starts to
-    execute. */
 
     while(1){
         xSemaphoreTake(Sem_UARTReceive,portMAX_DELAY);
@@ -165,12 +170,9 @@ void vTask_UART(void * param)
             }
             else
             {
-                /* if the received char is number update  received data */
+                /* if the received char is number, update received data */
                 Received_Data =  f_UART_Decoding (UART_Received_Char ,  Received_Data  , point_flag);
             }
-
         }
-
     }
-
 }

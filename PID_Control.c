@@ -1,28 +1,28 @@
- /*
- * PID_Control.c
+ /******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
-
+ * File Name:   PID_Control.c
+ *
+ * Description: PID feedback control source file
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 
 #include "PID_Control.h"
 #include "Orientation.h"
 
-/***********************************************
- *                 Global Variables
- ***********************************************/
 
-
-/***********************************************
- *                 Private Variables
- ***********************************************/
-
-
-/***********************************************
- *                 Private Functions
- ***********************************************/
-
+/******************************************************************************
+ *
+ * Function Name: Steering_Saturation
+ *
+ * Description: Checks if the Steering output is adjusted to the max/min steering
+ *              to be within the acceptable steering range.
+ *
+ * Arguments:   float Steering_Output
+ * Return:      float Max_Steering || float Steering_Output
+ *
+ *****************************************************************************/
 static float Steering_Saturation (float Steering_Output)
 {
     if (Steering_Output > Max_Steering)
@@ -39,6 +39,17 @@ static float Steering_Saturation (float Steering_Output)
     }
 }
 
+/******************************************************************************
+ *
+ * Function Name: Orientation_Saturation
+ *
+ * Description: Checks if the Orientation output is adjusted to the max/min
+ *              orientation to be within the acceptable orientation range.
+ *
+ * Arguments:   float Steering_Output
+ * Return:      float Max_Steering || float Steering_Output
+ *
+ *****************************************************************************/
 static float Orientation_Saturation (float Orientation_Output)
 {
     if (Orientation_Output > Max_Orientation)
@@ -55,18 +66,22 @@ static float Orientation_Saturation (float Orientation_Output)
     }
 }
 
-/***********************************************
- *                 Global Functions
- ***********************************************/
 
-
-float f_PID_Steering (float SP , float PV ,float * Accumlative_Error , float * Last_Error )
+/******************************************************************************
+ *
+ * Function Name: f_PID_Steering
+ *
+ * Description: PID Control Calculation function.
+ *
+ * Arguments:   float SP , float PV ,float * Accumlative_Error , float * Last_Error
+ * Return:      float Steering_Degrees
+ *
+ *****************************************************************************/
+float f_PID_Steering (float SP , float PV ,float * Accumlative_Error , float * Last_Error)
 {
 
-    //static float Accumlative_Error ;
     float Error ;
     float Drivative_Error ;
-    //static float Last_Error ;
     float Output ;
     float Steering_Degrees ;
 
@@ -77,7 +92,6 @@ float f_PID_Steering (float SP , float PV ,float * Accumlative_Error , float * L
     Output = Error * P_Constant_Steering +  (*Accumlative_Error) * I_Constant_Steering + Drivative_Error * D_Constant_Steering ;
 
     /* Saturation Function */
-   // Output = Orientation_Saturation(Output);
 
     Steering_Degrees = f_DecodingOrientIntoSteering(Output);
 
@@ -85,7 +99,6 @@ float f_PID_Steering (float SP , float PV ,float * Accumlative_Error , float * L
     Steering_Degrees = Steering_Saturation(Steering_Degrees) ;
 
     (*Last_Error) = Error;
-
 
     return Steering_Degrees;
 }

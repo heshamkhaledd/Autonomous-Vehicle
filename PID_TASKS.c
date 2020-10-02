@@ -1,66 +1,84 @@
-/*
- * PID_TASKS.c
+ /******************************************************************************
  *
- *  Created on: 7 Oct 2019
- *      Author: okasha
- */
-
-
+ * File Name:   PID_TASKS.c
+ *
+ * Description: PID source file to initialize and start the PID Control tasks.
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 #include "PID_TASKS.h"
 #include "UART_TASK.h"
 #include "Orientation.h"
 
 
-
-/***********************************************
- *                 Private Functions
- ***********************************************/
-
-
-/***********************************************************************************
+/******************************************************************************
  *
- * Name : getDesired
+ * Function Name: getDesired
  *
- * Purpose :  to make sure the car will not revolve around itself
+ * Description: Responsible for referencing the orientation angle to
+ *              the vehicle's absolute angle. Also, normalizing the
+ *              Orientation angle to be < 360 degrees.
  *
- * Parameters : current orientation , relative orientation .
+ * Arguments:   float current , float relative
+ * Return:      float desired
  *
- * return :  desired orientation.
- ************************************************************************************/
-
-static float getDesired (float current , float relative )
+ *****************************************************************************/
+static float getDesired (float current , float relative)
 {
     float desired ;
 
-    desired = current + relative ;
+    desired = current + relative;
+
     /* Orientation Overflow */
     if ( ((long)desired) > 360)
     {
         desired = desired - 360 ;
     }
+
     else if ( ((long)desired) < 0)
     {
         desired = desired + 360 ;
     }
+
     return desired ;
 }
 
-/***********************************************
- *                 Global Functions
- ***********************************************/
+/******************************************************************************
+ *
+ * Function Name: vInit_PID
+ *
+ * Description: Responsible for creating the PID Control Task in the FreeRTOS
+ *              MicroKernel.
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
+void vInit_PID(void){
 
-void vInit_PID(){
-
-    xTaskCreate( vTask_PID ,
-                 "PID_task" ,                       // Name of the task for later debugging
-                 PID_STACK_DEPTH ,                  // size of the stack.
-                 NULL ,                      // task parameters.
-                 configMAX_PRIORITIES-PID_vTASK_PRIO ,  // priority is inverted in freeRTOS.
-                 NULL ) ;            // handle of the task.
-
+    xTaskCreate( vTask_PID,                            /* Task Address       */
+                 "PID_task",                           /* Task name          */
+                 PID_STACK_DEPTH,                      /* Size of the stack. */
+                 NULL,                                 /* Task Parameters.   */
+                 configMAX_PRIORITIES-PID_vTASK_PRIO,  /* Task Priority .    */
+                 NULL);                                /* Task handle        */
 }
 
-void vTask_PID(void * para){
+
+/******************************************************************************
+ *
+ * Function Name: vTask_PID
+ *
+ * Description: PID Control Task. Responsible for getting the current vehicle's
+ *              orientation and adjust the stepper steps according to the
+ *              feedback.
+ *
+ * Arguments:   void *pvParameters
+ * Return:      void
+ *
+ *****************************************************************************/
+void vTask_PID(void * pvParameters){
 
     float f_Desired_Orientation =0;
     float f_Current_Orientation = 0;
@@ -72,14 +90,10 @@ void vTask_PID(void * para){
     float Last_Error =0;
 
     long usb_flag = 0 ;
-    /*     Inspect the high water mark of the calling task when the task starts to
-    execute.
-    PIDTaskHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
-     */
 
     while(1){
 
-           /* avoid handshacking */
+           /* Avoid Handshacking */
            if (usb_flag == 0)
            {
                usb_flag = 1 ;
@@ -134,13 +148,5 @@ void vTask_PID(void * para){
 
            Accumlative_Error = 0;
            Last_Error = 0;
-
        }
-
 }
-
-
-
-
-
-

@@ -1,46 +1,30 @@
-/*
- * Orientation.c
+ /******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
-
+ * File Name:   Orientation.c
+ *
+ * Description: Orientation adjustment source file
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 #include "Orientation.h"
 #include "UART.h"
 #include "UART_TASK.h"
 
 
-/*   Debuging variables   */
-/*long test_overlap ;
-float watch_steering_overlap ;*/
+/******************************************************************************
+ *
+ * Function Name: vGet_OrientationRef
+ *
+ * Description: USB Transmit Callback function. The function is triggered when
+ *              the USB module transmit data on the transmit buffer
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
+float vGet_OrientationRef(void){
 
-/***********************************************
- *                 Global Variables
- ***********************************************/
-
-
-
-/***********************************************
- *                 Private Variables
- ***********************************************/
-
-
-
-
-/***********************************************
- *                 Private Functions
- ***********************************************/
-
-
-
-/***********************************************
- *                 Global Functions
- ***********************************************/
-
-
-/* WROOOOOOOONG Function */
-float vGet_OrientationRef(void)
-{ /* Wrong logic in this function */
     float f_Reference_Orientation ;
     char Received_Char ;
     // Read Orientation just at beginning
@@ -56,8 +40,8 @@ float vGet_OrientationRef(void)
                 case 'o' :
                 case 'O' :
 
+                    /* Return Reference Orientation */
                     return f_Reference_Orientation ;
-                    //Return Reference Orientation
                 }
             }
             else
@@ -74,18 +58,19 @@ float vGet_OrientationRef(void)
  *
  * Name : f_DecodingOrientIntoSteering
  *
- * Purpose : this function aims to decode or get the steering angle to be excuted from
- *           the desired orientation.
- *           it has many approximations according to field experiments as maximum steering
- *           we can get from stepper is 360 degree which is almost equvilant to 45 degree
- *           if we thinking of orientation.
- *           so the decoding process depends on factor (ORIENT_TO_STEERING_PARAM) to map from
- *           orientation into steering and this factor also hold ratio of losses in mechanical
- *           system during excuting steering.
+ * Description: this function aims to decode or get the steering angle to be excuted from
+ *              the desired orientation.
+ *              it has many approximations according to field experiments as maximum steering
+ *              we can get from stepper is 360 degree which is almost equvilant to 45 degree
+ *              orientation wise.
+ *              so the decoding process depends on factor (ORIENT_TO_STEERING_PARAM) to map from
+ *              orientation into steering and this factor also hold ratio of losses in mechanical
+ *              system during excuting steering.
  *
- * Parameters : desired orientation.
+ * Arguments:   float f_Desired_Orientation
  *
- * return :  steering degrees.
+ * Return:      float Steering_Degrees
+ *
  ************************************************************************************/
 
 float f_DecodingOrientIntoSteering (float f_Desired_Orientation )

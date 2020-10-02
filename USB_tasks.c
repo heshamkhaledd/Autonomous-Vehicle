@@ -1,21 +1,22 @@
-/*
- * USB_tasks.c
+ /******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
-
-
+ * File Name:   USB_tasks.c
+ *
+ * Description: USB source file to initialize USB module tasks
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 #include "USB_tasks.h"
 
-/********************************************************************
- *                          Variables
- ********************************************************************/
 
 
+/* Declaring Global Variables */
 static void (*ptr_transmitapp)(void) = NULL;
 static void (*ptr_receiveapp)(void) = NULL ;
 static void * vpCDCDevice = NULL ;
+
+
 
 //*****************************************************************************
 //
@@ -25,67 +26,59 @@ static void * vpCDCDevice = NULL ;
 #define COMMAND_PACKET_RECEIVED 0x00000001
 #define COMMAND_STATUS_UPDATE   0x00000002
 
+
 volatile uint32_t g_ui32Flags = 0;
 char *g_pcStatus;
 
-//*****************************************************************************
-//
-// Global flag indicating that a USB configuration has been set.
-//
-//*****************************************************************************
-static volatile bool g_bUSBConfigured = false;
 
-/*****************************************************************
- *                       Semaphores
- *****************************************************************/
+/* Declaring Semaphores Handles */
+SemaphoreHandle_t Sem_USBReceive;
+SemaphoreHandle_t Sem_USBTransmit;
 
-SemaphoreHandle_t Sem_USBReceive ;
-SemaphoreHandle_t Sem_USBTransmit ;
-
-/********************************************************************
- *                        Private Functions
- ********************************************************************/
-
+/******************************************************************************
+ *
+ * Function Name: USB_HardwareConfiguration
+ *
+ * Description: Responsible for initializing the USB module for a specific
+ *              configuration.
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
 static void USB_HardwareConfiguration (void )
 {
 
     /* Configure the required pins for USB operation AS AN ANALOG function pins.*/
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);//enable clk to GPIOD
-    MAP_GPIOPinTypeUSBAnalog(GPIO_PORTD_BASE, GPIO_PIN_5 | GPIO_PIN_4);//PD4(PIN43)>>>>>(USB0D-)  PD5(PIN44)>>>>>>(USB0D+)
+
+    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);                    /* Enable clock to GPIOD */
+    MAP_GPIOPinTypeUSBAnalog(GPIO_PORTD_BASE, GPIO_PIN_5 | GPIO_PIN_4); /* PD4(PIN43):= (USB0D-) , PD5(PIN44):= (USB0D+) */
 
 
-    /*INIT TX AND RX BUFFERS*/
-    //buffer is defined in usb_serial_structs files
+    /*Initialize Tx (Transmit) and Rx (Receive) Buffers */
     USBBufferInit(&g_sTxBuffer);
     USBBufferInit(&g_sRxBuffer);
 
-    /*configure the tiva c to be device(slave) mode on the bus */
-    /*so the computer will be host(master) starts handshakes process*/
-    USBStackModeSet(0, eUSBModeForceDevice, 0);
+    USBStackModeSet(0, eUSBModeForceDevice, 0);     /* Configure the tiva c to be device(slave) mode on the bus) */
 
-    /*configure handshaking to  start(enumeration)
-     * (our device information to the USB library to inform pc its identity )
-     * */
-    vpCDCDevice = USBDCDCInit(0, &g_sCDCDevice);
+    vpCDCDevice = USBDCDCInit(0, &g_sCDCDevice);    /* Configure handshaking to  start (Enum) */
 
-    /*enable usb interrupt*/
-    ROM_IntEnable(INT_USB0);
+    ROM_IntEnable(INT_USB0);                        /*Enable USB0 Interrupt*/
 
 }
 
-/*****************************CALLBACK ROUTINES*********************************/
+/*****************************************************************
+ *                       Callback Routines
+ *****************************************************************/
 
 uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue, void *pvMsgData){
     return 0;
 }
 
-//*****************************************************************************
-// Handles CDC driver notifications related to the transmit channel (data to
-// the USB host).
-//*****************************************************************************
+
 uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
-    xSemaphoreGiveFromISR(Sem_USBTransmit,NULL);/* Please use "FromISR" for freeRTOS functions used in any ISR */
+    xSemaphoreGiveFromISR(Sem_USBTransmit,NULL);
     return(0);
 }
 
@@ -94,23 +87,27 @@ uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
 // Handles CDC driver notifications related to the receive channel (data from
 // the USB host).
 //*******************************
+
 uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
-    xSemaphoreGiveFromISR(Sem_USBReceive,NULL);/* Please use "FromISR" for freeRTOS functions used in any ISR */
+    xSemaphoreGiveFromISR(Sem_USBReceive,NULL);
     return(0);
 }
 
 
-/********************************************************************
- *                        Public Functions
- ********************************************************************/
-
-void vTASK_USBReceive (void * params)
+/******************************************************************************
+ *
+ * Function Name: vTASK_USBReceive
+ *
+ * Description: Responsible for initializing the USB module for a specific
+ *              configuration.
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
+void vTASK_USBReceive (void *pvParameters)
 {
-
-    /* Inspect the high water mark of the calling task when the task starts to
-    execute. */
-    //USBRecieveHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
 
     while (1)
     {
@@ -120,11 +117,20 @@ void vTASK_USBReceive (void * params)
         {
             (*ptr_receiveapp)();
         }
-      //  USBRecieveHighWaterMark = uxTaskGetStackHighWaterMark( NULL );
     }
-
 }
 
+/******************************************************************************
+ *
+ * Function Name: vTASK_USBTransmit
+ *
+ * Description:
+ *
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
 void vTASK_USBTransmit (void * params)
 {
     while(1)
@@ -139,30 +145,39 @@ void vTASK_USBTransmit (void * params)
     }
 }
 
+/******************************************************************************
+ *
+ * Function Name: vInit_USBTasks
+ *
+ * Description: Responsible Creating USB Tasks (vTASK_USBReceive, vTASK_USBTransmit)
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
 void vInit_USBTasks(void (* Ptr_TxHandler)(void), void (* Ptr_RxHandler)(void) )
 {
-    /* getting hardware ready */
+    /* Getting Hardware Ready */
     USB_HardwareConfiguration();
 
-    /* creating semaphores */
+    /* Creating Semaphores */
     Sem_USBReceive = xSemaphoreCreateBinary();
     Sem_USBTransmit = xSemaphoreCreateBinary();
 
-    /* creating tasks */
-    xTaskCreate(vTASK_USBReceive,
-                "USB_Recieve_task", //for later debugging
-                USB_StackDepth,
-                NULL,//no parameters needed
-                configMAX_PRIORITIES-USBReceive_prio,  // priority is inverted in  FreeRTOS
-                NULL);//no handle needed "used only for deleting the task"
+    /* Creating Tasks */
+    xTaskCreate(vTASK_USBReceive,                       /* Task Address       */
+                "USB_Recieve_task",                     /* Task Name          */
+                USB_StackDepth,                         /* Size of the stack. */
+                NULL,                                   /* Task Parameters    */
+                configMAX_PRIORITIES-USBReceive_prio,   /* Task Priority      */
+                NULL);
 
     xTaskCreate(vTASK_USBTransmit,
-                "USB_Transmit_task",//for later debugging
+                "USB_Transmit_task",
                 USB_StackDepth,
-                NULL,//no parameters needed
-                configMAX_PRIORITIES-USBTransmit_prio,  // priority is inverted in  FreeRTOS
-                NULL);//no handle needed "used only for deleting the task"
-
+                NULL,
+                configMAX_PRIORITIES-USBTransmit_prio,
+                NULL);
 
     ptr_transmitapp = Ptr_TxHandler ;
     ptr_receiveapp = Ptr_RxHandler ;

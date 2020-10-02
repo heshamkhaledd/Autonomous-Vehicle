@@ -1,13 +1,25 @@
-/*
- * State_Decode.c
+ /******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
-
-
+ * File Name:   State_Decode.c
+ *
+ * Description: USB State decoding source file
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 #include "State_Decode.h"
 
+
+/******************************************************************************
+ *
+ * Function Name: f_Orientation_Decoding
+ *
+ * Description: Responsible for converting USB data from ASCII to Decimal
+ *
+ * Arguments:   unsigned long USB_Received_Angle , float New_Orientation_Angle  , long point_flag
+ * Return:      float New_Orientation_Angle
+ *
+ *****************************************************************************/
 static float  f_Orientation_Decoding (unsigned long USB_Received_Angle , float New_Orientation_Angle  , long point_flag)
 {
     static long counter = 0 ;
@@ -30,6 +42,17 @@ static float  f_Orientation_Decoding (unsigned long USB_Received_Angle , float N
 }
 
 
+/******************************************************************************
+ *
+ * Function Name: State_Decoding
+ *
+ * Description: USB Task that's responsible for receiving the Orientation data
+ *              decode it, and push it to the appropriate queue.
+ *
+ * Arguments:   char USB_Received_Char
+ * Return:      void
+ *
+ *****************************************************************************/
 void State_Decoding (char USB_Received_Char)
 {
     static  float f_Orientation = 0; /* Getting Final Angle in here */

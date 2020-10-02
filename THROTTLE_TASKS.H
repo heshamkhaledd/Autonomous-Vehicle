@@ -1,21 +1,24 @@
-/*
- * THROTTLE_TASKS.H
+ /******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
+ * File Name:   THROTTLE_TASKS.h
+ *
+ * Description: Throttle control header file
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 
 #ifndef THROTTLE_TASKS_H_
 #define THROTTLE_TASKS_H_
 
-/*****************************************************************
- *                      Static Configuration
- *****************************************************************/
+/*******************************************************************************
+ *                           Preprocessor Definies                             *
+ *******************************************************************************/
+
+/* Static Configuration */
 #define THROTTLE_vTASK_STACK_DEPTH 80
 
-/*****************************************************************
- *           Throttle Driver Port&Pins configurations
- *****************************************************************/
+/* Throttle Driver Port&Pins configurations */
  #define THROTLE_DRIVER_PORT_CLOCK SYSCTL_PERIPH_GPIOA
  #define THROTLE_DRIVER_PORT_BASE GPIO_PORTA_BASE
  #define THROTLE_PULSE_PIN GPIO_PIN_2
@@ -25,11 +28,6 @@
 
  #define THROTLE_vTASK_PRIO 2
 
-/*****************************************************************
- *                    TASKS Declaration
- *****************************************************************/
-extern void vInit_throttle_Tasks();
-extern void vTask_throttle(void *);
 
 /****************************************************************
  *                        Structures
@@ -51,9 +49,13 @@ typedef struct {
  *                    Variables
  *****************************************************************/
 
-
 /* Queue Handlers for data from USB */
 extern QueueHandle_t Queue_throttle;
 
+/*******************************************************************************
+*                          Functions Prototypes                                *
+*******************************************************************************/
+extern void vInit_throttle_Tasks();
+extern void vTask_throttle(void *);
 
 #endif /* THROTTLE_TASKS_H_ */

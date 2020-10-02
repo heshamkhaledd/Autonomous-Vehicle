@@ -62,6 +62,15 @@
 
 #include "usb_serial_structs.h"
 
+
+//*****************************************************************************
+//
+// Flags used to pass commands from interrupt context to the main loop.
+//
+//*****************************************************************************
+#define COMMAND_PACKET_RECEIVED 0x00000001
+#define COMMAND_STATUS_UPDATE   0x00000002
+
 /*****************************************************************
  *                      Static Configuration
  *****************************************************************/

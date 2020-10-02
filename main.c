@@ -1,23 +1,22 @@
-//******************************************************//
-//                                                      //
-// Empty template for TM4C123GXL Projects using FreeRTOS//
-//                                                      //
-//******************************************************//
+/**********************************************************
+ *                                                        *
+ *      Cairo University Shell Eco-Racing Team            *
+ *      Shell Eco Marathon 2021 Autonomous System         *
+ *      Embedded Autonomous Movement Control Sub-team     *
+ *                                                        *
+ **********************************************************/
 
-//******************************************************//
-//                                                      //
-// SHELL ECO Autonomous team                            //
-//                                                      //
-// Electric Control Sub-team                            //
-//                                                      //
-//******************************************************//
+ /******************************************************************************
+ *
+ * File Name:   main.c
+ *
+ * Description: main source file to initialize and start the Autonomous System
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 
-
-#include "Initializations.h"
-#include "Defines.h"
-
-//freeRTOS includes
-
+/* FreeRTOS Includes */
 #include <FreeRTOS.h>
 #include <task.h>
 #include <timers.h>
@@ -25,26 +24,19 @@
 #include <queue.h>
 
 
-//CCS Default includes
-
+/* CCS Default Includes */
 #include <stdint.h>
 #include <stdbool.h>
 
-
-
-//TivaWARE minimal includes
-
+/* Tiva-Ware Macros/Defines Includes */
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_gpio.h"
 #include "inc/hw_sysctl.h"
-
 #include "inc/hw_uart.h"
 
-
-
-
+/* Tiva-Ware Drivers Includes */
 #include "driverlib/gpio.h"
 #include "driverlib/debug.h"
 #include "driverlib/fpu.h"
@@ -53,12 +45,8 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/sysctl.h"
-
 #include "driverlib/uart.h"
 #include "driverlib/usb.h"
-
-
-
 #include "usblib/usblib.h"
 #include "usblib/usbcdc.h"
 #include "usblib/usb-ids.h"
@@ -66,8 +54,7 @@
 #include "usblib/device/usbdcdc.h"
 #include "utils/ustdlib.h"
 
-
-
+/* Configurations Includes */
 #include "USB_tasks.h"
 #include "PID_TASKS.h"
 #include "State_Decode.h"
@@ -75,20 +62,41 @@
 #include "UART_TASK.h"
 #include "UART.h"
 
+/* Queues handles declarations */
 QueueHandle_t Queue_Feedback_Orientation;
 QueueHandle_t Queue_Desired_Orientation;
 QueueHandle_t Queue_steering;
 QueueHandle_t Queue_Current_Orientation;
 
-/*volatile UBaseType_t UARTTaskHighWaterMark;
-volatile UBaseType_t PIDTaskHighWaterMark;
-volatile UBaseType_t USBRecieveHighWaterMark;
-volatile UBaseType_t STEPTaskHighWaterMark;*/
 
+/******************************************************************************
+ *
+ * Function Name: tx_app
+ *
+ * Description: USB Transmit Callback function. The function is triggered when
+ *              the USB module transmit data on the transmit buffer
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
 void tx_app (void)
 {
+    /* Transmit code here */
 }
 
+
+/******************************************************************************
+ *
+ * Function Name: rx_app
+ *
+ * Description: USB Receive Callback function. The function is triggered when
+ *              the USB module receives data on the receive buffer.
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
 void rx_app (void)
 {
    uint8_t read_char;
@@ -98,55 +106,45 @@ void rx_app (void)
 
 }
 
+
 int main(void)
 {
-    // Enable lazy stacking for interrupt handlers.  This allows floating-point
-    // instructions to be used within interrupt handlers, but at the expense of
-    // extra stack usage.
-    //
-
+    /* Enable lazy stacking for interrupt handlers. This allows floating-point
+     * instructions to be used within interrupt handlers, but at the expense of
+     * extra stack usage. */
     MAP_FPULazyStackingEnable();
     MAP_FPUEnable();
 
-    //
-    // Set the clocking to run at 50 MHz from the PLL.
-    //
+    MAP_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN); /* Set the clocking to run at 50 MHz from the PLL. */
+    MAP_IntMasterEnable();                                                                      /* Enable Global Interrupt-bit */
 
-    MAP_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
-    MAP_IntMasterEnable();//enable global interrupt
+    /* Creating the Queues and storing their addresses in their handles */
+    Queue_Feedback_Orientation = xQueueCreate(1,4);
+    Queue_Current_Orientation = xQueueCreate(1,4);
+    Queue_Desired_Orientation = xQueueCreate(1,4);
+    Queue_steering = xQueueCreate(1,4);
 
 
-    ////////////////////////////////////////////////////////////
-
-    Queue_Feedback_Orientation = xQueueCreate( 1,4);
-    Queue_Current_Orientation = xQueueCreate( 1,4);
-    Queue_Desired_Orientation = xQueueCreate( 1,4);
-    Queue_steering = xQueueCreate( 1,4);// single element queue , 2 bytes in size
-
-    ////////////////////////////////////////////////////////////
-
+    /* Initializing System's modules */
     vInit_Steppers_Tasks();
     vInit_PID();
     vInit_USBTasks (tx_app,rx_app);
     UART1_Init(9600);
     vInit_UART();
 
-    // Prototype for xTaskCreate:
-        //
-        //  BaseType_t xTaskCreate( TaskFunction_t pvTaskCode,
-        //                          const char * const pcName,
-        //                          uint16_t usStackDepth,
-        //                          void *pvParameters,
-        //                          UBaseType_t uxPriority,
-        //                          TaskHandle_t *pvCreatedTask);
+        /* Prototype for xTaskCreate:
+        *
+        *  BaseType_t xTaskCreate( TaskFunction_t pvTaskCode,
+        *                          const char * const pcName,
+        *                          uint16_t usStackDepth,
+        *                          void *pvParameters,
+        *                          UBaseType_t uxPriority,
+        *                          TaskHandle_t *pvCreatedTask);
+        */
 
-    vTaskStartScheduler();  // Start FreeRTOS!
+    vTaskStartScheduler();  /* Run the Kernel's Scheduler */
 
-    // Should never get here since the RTOS should never "exit".
-    while(1) ;
+    /* UNREACHABLE CODE */
+    while(1);
 
 }
-
-
-
-

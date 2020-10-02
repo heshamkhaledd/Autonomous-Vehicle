@@ -1,14 +1,15 @@
-/*
- * PID_TASKS.h
+ /******************************************************************************
  *
- *  Created on: 7 Oct 2019
- *      Author: okasha
- */
+ * File Name:   PID_TASKS.h
+ *
+ * Description: PID header file to initialize and start the PID Control tasks.
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 
 #ifndef PID_TASKS_H_
 #define PID_TASKS_H_
-
-//freeRTOS includes
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -27,8 +28,16 @@
 #include "driverlib/sysctl.h"
 
 
+/*******************************************************************************
+ *                           Preprocessor Definies                             *
+ *******************************************************************************/
+#define STEERING_STEP 1.8
+#define PID_STACK_DEPTH 200
+#define PID_vTASK_PRIO 1
+
+
 /****************************************************
- *                Global Variables
+ *                Global Variables                  *
  ****************************************************/
 extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Feedback_Orientation;
@@ -40,16 +49,9 @@ extern float watch_steering ;
 
 extern volatile UBaseType_t PIDTaskHighWaterMark ;
 
-/****************************************************
- *                Defines
- ****************************************************/
-
-#define STEERING_STEP 1.8
-#define PID_STACK_DEPTH 200
-#define PID_vTASK_PRIO 1
-
-
-
+/*******************************************************************************
+ *                          Functions Prototypes                               *
+ *******************************************************************************/
 extern void vInit_PID();
 void vTask_PID(void * para);
 

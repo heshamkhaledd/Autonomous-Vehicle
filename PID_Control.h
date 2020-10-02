@@ -1,9 +1,12 @@
-/*
- * PID_Control.h
+ /******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
+ * File Name:   PID_Control.h
+ *
+ * Description: PID feedback control header file
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 
 #ifndef PID_CONTROL_H_
 #define PID_CONTROL_H_
@@ -19,10 +22,11 @@
 
 
 
-/***********************************************
- *                 Configurations
- ***********************************************/
+/*******************************************************************************
+ *                           Preprocessor Definies                             *
+ *******************************************************************************/
 
+/* Configurations */
 #define P_Constant_Steering 0.8
 #define I_Constant_Steering 0
 #define D_Constant_Steering 0
@@ -35,9 +39,9 @@
 
 #define Time_Interval 0.1
 
-/***********************************************
- *                 Global Functions
- ***********************************************/
+/*******************************************************************************
+ *                          Functions Prototypes                               *
+ *******************************************************************************/
 
 extern float f_PID_Steering (float SP , float PV ,float * Accumlative_Error , float * Last_Error);
 

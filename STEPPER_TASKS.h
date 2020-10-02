@@ -1,9 +1,12 @@
-/*
- * STEPPER_TASKS.h
+ /******************************************************************************
  *
- *  Created on: 09/17/2019
- *      Author: Okasha
- */
+ * File Name:   STEPPER_TASKS.h
+ *
+ * Description: Stepper motor header file to initialize stepper motor tasks
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 
 
 
@@ -11,8 +14,6 @@
 #ifndef STEPPER_TASKS_H_
 #define STEPPER_TASKS_H_
 
-
-/*                      TIVAware libraries                   */
 #include "inc/hw_ints.h"
 #include <stdint.h>
 #include <stdbool.h>
@@ -23,8 +24,6 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 
-//freeRTOS includes
-
 #include <FreeRTOS.h>
 #include <task.h>
 #include <timers.h>
@@ -32,16 +31,14 @@
 #include <queue.h>
 
 
-/*****************************************************************
- *                      Static Configuration
- *****************************************************************/
+/*******************************************************************************
+ *                           Preprocessor Definies                             *
+ *******************************************************************************/
+
+/* Static Configurations */
 #define STEPPER_vTASK_STACK_DEPTH 80
 
-
-
-/*****************************************************************
- *           Steering Driver Port&Pins configurations
- *****************************************************************/
+/* Steering Driver Port&Pins configurations */
  #define STEERING_DRIVER_PORT_CLOCK SYSCTL_PERIPH_GPIOF
  #define STEERING_DRIVER_PORT_BASE GPIO_PORTF_BASE
  #define STEERING_PULSE_PIN GPIO_PIN_1
@@ -51,10 +48,7 @@
 
  #define STEERING_vTASK_PRIO 2
 
-
-/*****************************************************************
- *           Steering Driver Port&Pins configurations
- *****************************************************************/
+/* Steering Driver Port&Pins configurations */
  #define BRAKES_DRIVER_PORT_CLOCK SYSCTL_PERIPH_GPIOB
  #define BRAKES_DRIVER_PORT_BASE GPIO_PORTB_BASE
  #define BRAKES_PULSE_PIN GPIO_PIN_2
@@ -63,15 +57,11 @@
  #define BRAKES_STEP_DELAY 10
 
  #define BRAKES_vTASK_PRIO 1
-/*****************************************************************
- *                    TASKS Declaration
- *****************************************************************/
- extern void vInit_Steppers_Tasks();
- extern void vTask_Stepper(void *);
+
  
- /****************************************************************
-  *                        Structures
-  ***************************************************************/
+/****************************************************************
+ *                       Structures                             *
+*****************************************************************/
 
   /* Structure of the different parameters used in each task */
      typedef struct {
@@ -85,17 +75,19 @@
      } stepper_params;
 
 
- /*****************************************************************
-  *                    Variables
-  *****************************************************************/
-
+/*****************************************************************
+ *                          Variables                            *
+******************************************************************/
 
  /* Queue Handlers for data from USB */
      extern QueueHandle_t Queue_steering;
 
 
-
-
+/*******************************************************************************
+*                          Functions Prototypes                                *
+*******************************************************************************/
+extern void vInit_Steppers_Tasks();
+extern void vTask_Stepper(void *);
 
 
  
