@@ -142,10 +142,7 @@ void vTask_UART(void * param)
                                        sign_flag = 1 ;
                                        point_flag = 0 ;
                     break;
-                    /* back to default to receive new data */
-                                       Received_Data = 0;
-                                       sign_flag = 1 ;
-                                       point_flag = 0 ;
+
                 case 'q' :
                 case 'Q' :
                     /* back to default to receive new data */
@@ -163,6 +160,7 @@ void vTask_UART(void * param)
                     /* unexpected Received data Case */
                 default :
                    /* handling unexpected data */
+                    break;
                 }
             }
             else

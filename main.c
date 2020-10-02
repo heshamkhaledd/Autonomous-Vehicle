@@ -65,7 +65,7 @@
 #include "usblib/device/usbdevice.h"
 #include "usblib/device/usbdcdc.h"
 #include "utils/ustdlib.h"
-#include "utils/uartstdio.h"
+
 
 
 #include "USB_tasks.h"

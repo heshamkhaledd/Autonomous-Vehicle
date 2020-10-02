@@ -13,7 +13,7 @@
 
 
 /*                      TIVAware libraries                   */
-#include <inc/tm4c123gh6pm.h>
+#include "inc/hw_ints.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"

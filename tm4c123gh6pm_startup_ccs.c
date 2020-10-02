@@ -33,7 +33,6 @@ void ResetISR(void);
 static void NmiSR(void);
 static void FaultISR(void);
 static void IntDefaultHandler(void);
-static void WatchDog (void);
 //*****************************************************************************
 //
 // External declaration for the reset handler that is to be called when the
@@ -315,9 +314,4 @@ IntDefaultHandler(void)
     }
 }
 
-void WatchDog (void)
-{
-    while(1){
 
-    }
-}
