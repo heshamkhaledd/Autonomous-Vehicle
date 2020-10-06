@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
 //TivaWARE minimal includes
 
 #include "inc/hw_memmap.h"
@@ -33,11 +32,6 @@
 #include "driverlib/rom_map.h"
 #include "inc/hw_sysctl.h"
 
-#include "inc/hw_uart.h"
-
-
-
-
 #include "driverlib/gpio.h"
 #include "driverlib/debug.h"
 #include "driverlib/fpu.h"
@@ -46,10 +40,7 @@
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
 #include "driverlib/sysctl.h"
-
-#include "driverlib/uart.h"
 #include "driverlib/usb.h"
-
 
 
 #include "usblib/usblib.h"
@@ -57,19 +48,9 @@
 #include "usblib/usb-ids.h"
 #include "usblib/device/usbdevice.h"
 #include "usblib/device/usbdcdc.h"
-
-
-
 #include "usb_serial_structs.h"
 
-
-//*****************************************************************************
-//
-// Flags used to pass commands from interrupt context to the main loop.
-//
-//*****************************************************************************
-#define COMMAND_PACKET_RECEIVED 0x00000001
-#define COMMAND_STATUS_UPDATE   0x00000002
+#include "State_Decode.h"
 
 /*****************************************************************
  *                      Static Configuration
@@ -96,7 +77,6 @@ extern volatile UBaseType_t USBRecieveHighWaterMark ;
  *****************************************************************/
 
 extern SemaphoreHandle_t Sem_USBReceive ;
-extern SemaphoreHandle_t Sem_USBTransmit ;
 
 /*****************************************************************
  *                    TASKS Declaration
@@ -104,7 +84,7 @@ extern SemaphoreHandle_t Sem_USBTransmit ;
 
 extern void vTASK_USBReceive (void *) ;
 extern void vTASK_USBTransmit (void *) ;
-extern void vInit_USBTasks(void (* Ptr_TxHandler)(void), void (* Ptr_RxHandler)(void)) ;
+extern void vInit_USBTasks() ;
 
 
 

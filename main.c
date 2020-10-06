@@ -69,43 +69,6 @@ QueueHandle_t Queue_steering;
 QueueHandle_t Queue_Current_Orientation;
 
 
-/******************************************************************************
- *
- * Function Name: tx_app
- *
- * Description: USB Transmit Callback function. The function is triggered when
- *              the USB module transmit data on the transmit buffer
- *
- * Arguments:   void
- * Return:      void
- *
- *****************************************************************************/
-void tx_app (void)
-{
-    /* Transmit code here */
-}
-
-
-/******************************************************************************
- *
- * Function Name: rx_app
- *
- * Description: USB Receive Callback function. The function is triggered when
- *              the USB module receives data on the receive buffer.
- *
- * Arguments:   void
- * Return:      void
- *
- *****************************************************************************/
-void rx_app (void)
-{
-   uint8_t read_char;
-   USBBufferRead((tUSBBuffer *)&g_sRxBuffer,&read_char,1);
-   State_Decoding (read_char) ;
-   USBBufferWrite((tUSBBuffer *)&g_sTxBuffer,&read_char,1);
-
-}
-
 
 int main(void)
 {
@@ -128,7 +91,7 @@ int main(void)
     /* Initializing System's modules */
     vInit_Steppers_Tasks();
     vInit_PID();
-    vInit_USBTasks (tx_app,rx_app);
+    vInit_USBTasks();
     UART1_Init(9600);
     vInit_UART();
 

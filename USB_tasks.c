@@ -9,25 +9,8 @@
  ******************************************************************************/
 #include "USB_tasks.h"
 
-
-
-/* Declaring Global Variables */
-static void (*ptr_transmitapp)(void) = NULL;
-static void (*ptr_receiveapp)(void) = NULL ;
-static void * vpCDCDevice = NULL ;
-
-
-
-
-
-
-volatile uint32_t g_ui32Flags = 0;
-char *g_pcStatus;
-
-
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
-SemaphoreHandle_t Sem_USBTransmit;
 
 /******************************************************************************
  *
@@ -55,7 +38,7 @@ static void USB_HardwareConfiguration (void )
 
     USBStackModeSet(0, eUSBModeForceDevice, 0);     /* Configure the tiva c to be device(slave) mode on the bus) */
 
-    vpCDCDevice = USBDCDCInit(0, &g_sCDCDevice);    /* Configure handshaking to  start (Enum) */
+    USBDCDCInit(0, &g_sCDCDevice);    /* Configure handshaking to  start (Enum) */
 
     ROM_IntEnable(INT_USB0);                        /*Enable USB0 Interrupt*/
 
@@ -69,22 +52,25 @@ uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue
     return 0;
 }
 
-
+/*****************************************************************
+ *                       Transmit Handler
+ *****************************************************************/
 uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
-    xSemaphoreGiveFromISR(Sem_USBTransmit,NULL);
-    return(0);
+    /*We don't need to do anything here as this handler will be called after we send the data in the Transmit task*/
+    return(0);  
+    
 }
 
-
-//*****************************************************************************
-// Handles CDC driver notifications related to the receive channel (data from
-// the USB host).
-//*******************************
-
+/*****************************************************************
+ *                       Receive Handler
+ *****************************************************************/
 uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
-    xSemaphoreGiveFromISR(Sem_USBReceive,NULL);
+    if(ui32Event == USB_EVENT_RX_AVAILABLE) /*Checking the receive event to give the semaphore*/
+    {
+        xSemaphoreGiveFromISR(Sem_USBReceive,NULL);
+    }
     return(0);
 }
 
@@ -102,15 +88,23 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
  *****************************************************************************/
 void vTASK_USBReceive (void *pvParameters)
 {
-
-    while (1)
+    uint8_t dataFromHost[arr_size],i=0;
+    while(1)
     {
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
-        USBDCDCPacketRead(vpCDCDevice,g_pui8USBRxBuffer,UART_BUFFER_SIZE,false);
-        if(ptr_receiveapp != NULL)
+        USBBufferRead(&g_sRxBuffer,&dataFromHost[i],1);
+        // USBBufferWrite(&g_sTxBuffer,&dataFromHost[i],1); /*Line to echo the data to putty's terminal*/
+        if(dataFromHost[i] == 'O' || dataFromHost[i] == 'o')
         {
-            (*ptr_receiveapp)();
+            dataFromHost[i+1] = '\0'; 
+            State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
+            i=0;
         }
+        else
+        {
+            i++;
+        }
+        
     }
 }
 
@@ -127,14 +121,12 @@ void vTASK_USBReceive (void *pvParameters)
  *****************************************************************************/
 void vTASK_USBTransmit (void * params)
 {
+    /*We need a queue here to communicate with the received data from UART "in a string format" 
+    to send it back to the processor*/
     while(1)
     {
-        xSemaphoreTake(Sem_USBTransmit,portMAX_DELAY);
-        USBDCDCPacketWrite(vpCDCDevice,g_pui8USBTxBuffer,UART_BUFFER_SIZE,false);
-        if(ptr_transmitapp != NULL)
-        {
-            (*ptr_transmitapp)();
-        }
+        
+
 
     }
 }
@@ -149,14 +141,13 @@ void vTASK_USBTransmit (void * params)
  * Return:      void
  *
  *****************************************************************************/
-void vInit_USBTasks(void (* Ptr_TxHandler)(void), void (* Ptr_RxHandler)(void) )
+void vInit_USBTasks()
 {
     /* Getting Hardware Ready */
     USB_HardwareConfiguration();
 
     /* Creating Semaphores */
     Sem_USBReceive = xSemaphoreCreateBinary();
-    Sem_USBTransmit = xSemaphoreCreateBinary();
 
     /* Creating Tasks */
     xTaskCreate(vTASK_USBReceive,                       /* Task Address       */
@@ -172,7 +163,4 @@ void vInit_USBTasks(void (* Ptr_TxHandler)(void), void (* Ptr_RxHandler)(void) )
                 NULL,
                 configMAX_PRIORITIES-USBTransmit_prio,
                 NULL);
-
-    ptr_transmitapp = Ptr_TxHandler ;
-    ptr_receiveapp = Ptr_RxHandler ;
 }
