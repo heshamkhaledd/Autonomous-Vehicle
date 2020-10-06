@@ -55,10 +55,6 @@
  *                    Dynamic Configuration
  ***********************************************************/
 
-/*
-extern volatile UBaseType_t UARTTaskHighWaterMark ;*/
-
-extern QueueHandle_t Queue_Current_Orientation;
 extern SemaphoreHandle_t Sem_UARTReceive;
 
 /**********************************************************

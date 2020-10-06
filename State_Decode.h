@@ -30,6 +30,10 @@
 #define Numbers_Ascii_Base 0x30
 #define Numbers_Ascii_Offset 9
 
+#define arr_size       15
+
+#define UART_MODULE    0
+#define USB_MODULE     1
 
 /****************************************************
  *                Global Variables                  *
@@ -38,11 +42,12 @@ extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Feedback_Orientation;
 extern QueueHandle_t Queue_Desired_Orientation;
 extern QueueHandle_t Queue_steering;
+extern QueueHandle_t Queue_Current_Orientation;
 
 
 /*******************************************************************************
  *                          Functions Prototypes                               *
  *******************************************************************************/
-extern void State_Decoding (char USB_Received_Char);
+void State_Decoding (uint8_t * Data, uint8_t Module);
 
 #endif /* STATE_DECODE_H_ */
