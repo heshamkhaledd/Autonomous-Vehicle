@@ -14,6 +14,28 @@ SemaphoreHandle_t Sem_USBReceive;
 
 /******************************************************************************
  *
+ * Function Name: USB_GetLineCoding
+ *
+ * Description: Responsible for setting the USB serial configurations.
+ *
+ * Arguments:   tLineCoding *psLineCoding
+ * Return:      void
+ *
+ *****************************************************************************/
+void USB_GetLineCoding(tLineCoding *psLineCoding)
+{
+    /*115200 baud rate*/
+    psLineCoding->ui32Rate =115200;
+    /*one stop bit*/
+    psLineCoding->ui8Stop = USB_CDC_STOP_BITS_1;
+    /*8-bit data*/
+    psLineCoding->ui8Databits = 8;
+    /*no parity bits*/
+    psLineCoding->ui8Parity =USB_CDC_PARITY_NONE;
+}
+
+/******************************************************************************
+ *
  * Function Name: USB_HardwareConfiguration
  *
  * Description: Responsible for initializing the USB module for a specific
@@ -48,7 +70,37 @@ static void USB_HardwareConfiguration (void )
  *                       Callback Routines
  *****************************************************************/
 
-uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue, void *pvMsgData){
+uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue, void *pvMsgData)
+{
+    switch(ui32Event)
+       {
+
+           case USB_EVENT_CONNECTED:
+
+               g_bUSBConfigured = true;
+               /*flushing the buffers*/
+               USBBufferFlush(&g_sTxBuffer);
+               USBBufferFlush(&g_sRxBuffer);
+
+               break;
+
+
+           case USB_EVENT_DISCONNECTED:
+               g_bUSBConfigured = false;
+
+               break;
+
+
+           case USBD_CDC_EVENT_GET_LINE_CODING:
+           case USBD_CDC_EVENT_SET_LINE_CODING:
+               /*setting the USB serial configurations*/
+               USB_GetLineCoding(pvMsgData);
+               break;
+
+
+           default:
+               break;
+       }
     return 0;
 }
 
