@@ -9,22 +9,22 @@
  ******************************************************************************/
 #include "PID_TASKS.h"
 #include "UART_TASK.h"
-#include "Orientation.h"
 
 
 /******************************************************************************
  *
- * Function Name: getDesired
+ * Function Name: getDesiredOrientation
  *
  * Description: Responsible for referencing the orientation angle to
- *              the vehicle's absolute angle. Also, normalizing the
- *              Orientation angle to be < 360 degrees.
+ *              the vehicle's absolute angle. 
+ *              Also, normalizes the orientation angle to be 0< angle< 360 
+ *              so that PID calculations are all positive
  *
  * Arguments:   float current , float relative
  * Return:      float desired
  *
  *****************************************************************************/
-static float getDesired (float current , float relative)
+static float getDesiredOrientation(float current , float relative)
 {
     float desired ;
 
@@ -101,8 +101,8 @@ void vTask_PID(void * pvParameters){
                              &currentOrientation,
                              portMAX_DELAY);
         
-        /*Calculate desired orientation*/
-        desiredOrientation = getDesired (currentOrientation,orientationDifference);
+        /*Calculate desired orientation from current orientation and orientation difference*/
+        desiredOrientation = getDesiredOrientation (currentOrientation,orientationDifference);
 
         /*Apply PID control to recieved system inputs*/
         while(1)

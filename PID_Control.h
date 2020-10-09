@@ -27,13 +27,13 @@
  *******************************************************************************/
 
 /* Configurations */
-#define Max_Steering 360
-#define Min_Steering -360
-
-#define Max_Orientation 45
-#define Min_Orientation -45
-
 #define Time_Interval 0.1
+
+/* steering Configurations */
+#define ORIENT_TO_STEERING_PARAM 24
+#define OVERLAP_CORRECTION_FACTOR 360.0f
+#define MAX_STEERING 360
+#define MIN_STEERING -360
 
 /****************************************************************
  *                       Structures                             *
