@@ -80,73 +80,53 @@ void vInit_PID(void){
  *****************************************************************************/
 void vTask_PID(void * pvParameters){
 
-    float f_Desired_Orientation =0;
-    float f_Current_Orientation = 0;
-    float f_Refernece_Orientation =0;
-    float f_Steering = 0;
-    long l_Steps = 0;
+    /*Task variables*/
+    float desiredOrientation =0;
+    float currentOrientation = 0;
+    float orientationDifference =0;
+    float motorSteering = 0;
+    long motorSteps = 0;
 
-    float Accumlative_Error =0;
-    float Last_Error =0;
+    PIDcontroller s_controller={0.8,0,0,0,0};
 
-    long usb_flag = 0 ;
+    while(1)
+    {
+        /*Receive orientation difference relative to current position*/ 
+        xQueueReceive(Queue_Desired_Orientation,
+                             &orientationDifference,
+                             portMAX_DELAY);  
 
-    while(1){
-
-           /* Avoid Handshacking */
-           if (usb_flag == 0)
-           {
-               usb_flag = 1 ;
-               xQueueReceive(Queue_Desired_Orientation,
-                             &f_Refernece_Orientation,
+        /*Receive current orientation*/
+        xQueueReceive(Queue_Current_Orientation,
+                             &currentOrientation,
                              portMAX_DELAY);
-           }
+        
+        /*Calculate desired orientation*/
+        desiredOrientation = getDesired (currentOrientation,orientationDifference);
 
-           if (usb_flag == 1)
-           {
-               usb_flag = 2 ;
+        /*Apply PID control to recieved system inputs*/
+        while(1)
+        {
+            /*check if a new set point is received*/
+            if(xQueuePeek(Queue_Desired_Orientation,&orientationDifference,portMAX_DELAY))  
+            {
+                s_controller.lastError=0;
+                s_controller.accumlativeError=0;
+                break;
+            }
 
-               xQueueReceive(Queue_Desired_Orientation,
-                             &f_Refernece_Orientation,
-                             portMAX_DELAY);
-
-               f_Desired_Orientation = getDesired (f_Current_Orientation,f_Refernece_Orientation);
-           }
-
-           xQueueReceive(Queue_Current_Orientation,
-                         &f_Current_Orientation,
-                         0);
-
-           f_Steering = f_DecodingOrientIntoSteering(f_Refernece_Orientation) ;
-
-           l_Steps = (long)((f_Steering) / STEERING_STEP);
-
-           xQueueOverwrite(Queue_steering,&l_Steps);
-
-           do{
-               if(xQueueReceive(Queue_Desired_Orientation,&f_Refernece_Orientation,0) == pdPASS){
-                   break;
-               }
-               vTaskDelay(20);
-
-               xQueueReceive(Queue_Current_Orientation,
-                             &f_Current_Orientation,
+            /*else keep applying PID control on old set point*/
+            xQueueReceive(Queue_Current_Orientation,
+                             &currentOrientation,
                              portMAX_DELAY);
 
-               f_Steering = f_PID_Steering(f_Desired_Orientation ,
-                                           f_Current_Orientation ,
-                                           &Accumlative_Error,
-                                           &Last_Error);
+            motorSteering = PID_control(&s_controller,desiredOrientation ,currentOrientation);
+            motorSteps = (long)((motorSteering) / STEERING_STEP);
+            xQueueOverwrite(Queue_steering,&motorSteps);
 
-               l_Steps = (long)((f_Steering) / STEERING_STEP);
+            /*Delay task to allow receiving new inputs to system and to allow motor task to be scheduled*/
+             vTaskDelay(20);
+        }
 
-               xQueueOverwrite(Queue_steering,&l_Steps);
-
-           }while(1);
-
-           f_Desired_Orientation = getDesired (f_Current_Orientation,f_Refernece_Orientation);
-
-           Accumlative_Error = 0;
-           Last_Error = 0;
-       }
+    }
 }

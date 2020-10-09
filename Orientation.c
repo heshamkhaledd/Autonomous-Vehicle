@@ -13,7 +13,7 @@
 
 
 /******************************************************************************
- *
+ * NOT USED FUNCTION
  * Function Name: vGet_OrientationRef
  *
  * Description: USB Transmit Callback function. The function is triggered when
@@ -72,7 +72,7 @@ float vGet_OrientationRef(void){
  * Return:      float Steering_Degrees
  *
  ************************************************************************************/
-
+/*TODO:: change ORIENT_TO_STEERING_PARAM*/
 float f_DecodingOrientIntoSteering (float f_Desired_Orientation )
 {
     float Steering_Degrees ;

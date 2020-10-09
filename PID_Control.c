@@ -73,32 +73,37 @@ static float Orientation_Saturation (float Orientation_Output)
  *
  * Description: PID Control Calculation function.
  *
- * Arguments:   float SP , float PV ,float * Accumlative_Error , float * Last_Error
- * Return:      float Steering_Degrees
+ * Arguments:   float a_setPoint , float a_currentValue 
+ * Return:      float motorSteeringDegrees
  *
  *****************************************************************************/
-float f_PID_Steering (float SP , float PV ,float * Accumlative_Error , float * Last_Error)
+float PID_control (PIDcontroller* a_controller,float a_currentValue , float a_setPoint )
 {
+    float currentError ;
+    float derivativeError ;
+    float pidOutput ;
+    float motorSteeringDegrees ;
 
-    float Error ;
-    float Drivative_Error ;
-    float Output ;
-    float Steering_Degrees ;
+    /* Calculating P component*/
+    currentError = a_setPoint - a_currentValue ;
 
-    Error = SP - PV ;
-    (*Accumlative_Error) = (*Accumlative_Error) + (Error * Time_Interval) ;
-    Drivative_Error = (Error-(*Last_Error)) / Time_Interval ;
+    /*Calculating I component*/
+    a_controller->accumlativeError += (currentError * Time_Interval) ;
 
-    Output = Error * P_Constant_Steering +  (*Accumlative_Error) * I_Constant_Steering + Drivative_Error * D_Constant_Steering ;
+    /*Calculating D component*/
+    derivativeError = (currentError-(a_controller->lastError)) / Time_Interval ;
 
-    /* Saturation Function */
+    /*PID output*/
+    pidOutput = currentError * a_controller->Kp +  a_controller->accumlativeError * a_controller->Ki + derivativeError * a_controller->Kd ;
 
-    Steering_Degrees = f_DecodingOrientIntoSteering(Output);
+    /*Change orientation degrees to steering */
+    motorSteeringDegrees = f_DecodingOrientIntoSteering(pidOutput);
 
-    /* Saturation Function */
-    Steering_Degrees = Steering_Saturation(Steering_Degrees) ;
+    /*Steering saturation Function */
+    motorSteeringDegrees = Steering_Saturation(motorSteeringDegrees) ;
 
-    (*Last_Error) = Error;
+    /*updating controller's last Error*/
+    a_controller->lastError = currentError;
 
-    return Steering_Degrees;
+    return motorSteeringDegrees;
 }
