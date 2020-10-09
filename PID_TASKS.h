@@ -31,7 +31,14 @@
 /*******************************************************************************
  *                           Preprocessor Definies                             *
  *******************************************************************************/
+/* steering Configurations */
 #define STEERING_STEP 1.8
+#define ORIENT_TO_STEERING_PARAM 24
+#define OVERLAP_CORRECTION_FACTOR 360.0f
+#define MAX_STEERING 360
+#define MIN_STEERING -360
+
+
 #define PID_STACK_DEPTH 200
 #define PID_vTASK_PRIO 1
 

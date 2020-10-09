@@ -7,7 +7,6 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-
 #ifndef PID_CONTROL_H_
 #define PID_CONTROL_H_
 
@@ -29,12 +28,6 @@
 /* Configurations */
 #define Time_Interval 0.1
 
-/* steering Configurations */
-#define ORIENT_TO_STEERING_PARAM 24
-#define OVERLAP_CORRECTION_FACTOR 360.0f
-#define MAX_STEERING 360
-#define MIN_STEERING -360
-
 /****************************************************************
  *                       Structures                             *
 *****************************************************************/
@@ -54,7 +47,7 @@ typedef struct{
 /*******************************************************************************
  *                          Functions Prototypes                               *
  *******************************************************************************/
-extern float PID_control (PIDcontroller* controller,float SP , float PV);
+extern float f_PID_control (PIDcontroller* controller,float SP , float PV);
 
 
 #endif /* PID_CONTROL_H_ */
