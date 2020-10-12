@@ -28,6 +28,8 @@
 #define NEGATIVE_TO_POSITIVE_WRAP_AROUND    2
 
 typedef int8_t WRAP_AROUND_FLAG;
+
+
 /*******************************************************************************
  *                                 Macros                                    *
  *******************************************************************************/
@@ -43,5 +45,6 @@ typedef int8_t WRAP_AROUND_FLAG;
  *******************************************************************************/
 WRAP_AROUND_FLAG int8_getOrientationWrapAroundFlag(float a_currentOrientation, float a_desiredOrienatation);
 void v_adjustDesiredOrientaion(WRAP_AROUND_FLAG a_wrapAroundFlag, float currentOrientation, float * a_desiredOrientationPtr);
+float f_DecodeOrientationIntoSteering (float a_desiredOrientation);
 
 #endif /*ORIENT_STEER_UTILS_H*/
