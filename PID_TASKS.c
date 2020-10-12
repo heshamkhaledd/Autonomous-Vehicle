@@ -10,40 +10,6 @@
 #include "PID_TASKS.h"
 #include "UART_TASK.h"
 
-
-/******************************************************************************
- *
- * Function Name: getDesiredOrientation
- *
- * Description: Responsible for referencing the orientation angle to
- *              the vehicle's absolute angle. 
- *              Also, normalizes the orientation angle to be 0< angle< 360 
- *              so that PID calculations are all positive
- *
- * Arguments:   float current , float relative
- * Return:      float desired
- *
- *****************************************************************************/
-static float getDesiredOrientation(float current , float relative)
-{
-    float desired ;
-
-    desired = current + relative;
-
-    /* Orientation Overflow */
-    if ( ((long)desired) > 360)
-    {
-        desired = desired - 360 ;
-    }
-
-    else if ( ((long)desired) < 0)
-    {
-        desired = desired + 360 ;
-    }
-
-    return desired ;
-}
-
 /******************************************************************************
  *
  * Function Name: Steering_Saturation
@@ -89,11 +55,11 @@ float f_DecodeOrientationIntoSteering (float f_Desired_Orientation )
 
     if ( (long) f_Desired_Orientation > 180)
     {
-        steeringDegrees = (((float)ORIENT_TO_STEERING_PARAM ) * (f_Desired_Orientation - OVERLAP_CORRECTION_FACTOR )) ;
+        steeringDegrees = (((float)ORIENT_TO_STEERING_PARAM ) * (f_Desired_Orientation - WRAP_AROUND_CORRECTION_FACTOR )) ;
     }
     else if ( (long) f_Desired_Orientation < -180)
     {
-        steeringDegrees = (((float)ORIENT_TO_STEERING_PARAM ) * (f_Desired_Orientation + OVERLAP_CORRECTION_FACTOR )) ;
+        steeringDegrees = (((float)ORIENT_TO_STEERING_PARAM ) * (f_Desired_Orientation + WRAP_AROUND_CORRECTION_FACTOR )) ;
     }
     else
     {
@@ -133,6 +99,8 @@ void vInit_PID(void){
  * Description: PID Control Task. Responsible for getting the current vehicle's
  *              orientation and adjust the stepper steps according to the
  *              feedback.
+ *              This function assumes that the input in both the feedback queue and
+ *              the desired orientation queue ranges between -180 and 180.
  *
  * Arguments:   void *pvParameters
  * Return:      void
@@ -146,6 +114,7 @@ void vTask_PID(void * pvParameters){
     float orientationDifference =0;
     float pidOrientationOutput = 0;
     long motorSteps = 0;
+    WRAP_AROUND_FLAG wrapAroundFlag=-1;
 
     PIDcontroller s_controller={0.8,0,0,0,0};
 
@@ -161,8 +130,9 @@ void vTask_PID(void * pvParameters){
                              &currentOrientation,
                              portMAX_DELAY);
         
-        /*Calculate desired orientation from current orientation and orientation difference*/
-        desiredOrientation = getDesiredOrientation (currentOrientation,orientationDifference);
+        /*Calculate desired orientation relative to current orientation and check if a wrap around occurs*/
+        desiredOrientation = currentOrientation + orientationDifference;
+        wrapAroundFlag=int8_getOrientationWrapAroundFlag(currentOrientation,desiredOrientation);
 
         /*Apply PID control to recieved system inputs*/
         while(1)
@@ -174,18 +144,21 @@ void vTask_PID(void * pvParameters){
                 s_controller.accumlativeError=0;
                 break;
             }
-
             /*else keep applying PID control on old set point*/
             xQueueReceive(Queue_Current_Orientation,
                              &currentOrientation,
                              portMAX_DELAY);
 
+            /*adjust desired orientation if wrap around happens*/
+            if(wrapAroundFlag != -1)
+                v_adjustDesiredOrientaion(wrapAroundFlag,currentOrientation,&desiredOrientation);
+            
             pidOrientationOutput=f_PID_control(&s_controller,desiredOrientation ,currentOrientation);
             
             /*Change orientation degrees to motor steering steps and checks for direction*/
             motorSteps=f_DecodeOrientationIntoSteering(pidOrientationOutput);
             motorSteps = (long)((motorSteps) / STEERING_STEP);
-            
+
             xQueueOverwrite(Queue_steering,&motorSteps);
 
             /*Delay task to allow receiving new inputs to system and to allow motor task to be scheduled*/
