@@ -27,14 +27,14 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 
+#include "orientationAndSteeringUtils.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *
  *******************************************************************************/
-#define STEERING_STEP 1.8
+#define ERROR_FACTOR    0
 #define PID_STACK_DEPTH 200
-#define PID_vTASK_PRIO 1
-
+#define PID_vTASK_PRIO  1
 
 /****************************************************
  *                Global Variables                  *

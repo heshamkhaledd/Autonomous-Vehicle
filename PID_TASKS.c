@@ -9,40 +9,11 @@
  ******************************************************************************/
 #include "PID_TASKS.h"
 #include "UART_TASK.h"
-#include "Orientation.h"
 
-
-/******************************************************************************
- *
- * Function Name: getDesired
- *
- * Description: Responsible for referencing the orientation angle to
- *              the vehicle's absolute angle. Also, normalizing the
- *              Orientation angle to be < 360 degrees.
- *
- * Arguments:   float current , float relative
- * Return:      float desired
- *
- *****************************************************************************/
-static float getDesired (float current , float relative)
-{
-    float desired ;
-
-    desired = current + relative;
-
-    /* Orientation Overflow */
-    if ( ((long)desired) > 360)
-    {
-        desired = desired - 360 ;
-    }
-
-    else if ( ((long)desired) < 0)
-    {
-        desired = desired + 360 ;
-    }
-
-    return desired ;
-}
+/*
+    TODO::    -Make sure of the discontinuity point
+              -change ORIENT_TO_STEERING_PARAM
+*/
 
 /******************************************************************************
  *
@@ -73,6 +44,8 @@ void vInit_PID(void){
  * Description: PID Control Task. Responsible for getting the current vehicle's
  *              orientation and adjust the stepper steps according to the
  *              feedback.
+ *              This function assumes that the input in both the feedback queue and
+ *              the desired orientation queue ranges between -180 and 180.
  *
  * Arguments:   void *pvParameters
  * Return:      void
@@ -80,73 +53,63 @@ void vInit_PID(void){
  *****************************************************************************/
 void vTask_PID(void * pvParameters){
 
-    float f_Desired_Orientation =0;
-    float f_Current_Orientation = 0;
-    float f_Refernece_Orientation =0;
-    float f_Steering = 0;
-    long l_Steps = 0;
+    /*Task variables*/
+    float desiredOrientation =0;
+    float currentOrientation = 0;
+    float orientationDifference =0;
+    float pidOrientationOutput = 0;
+    long motorSteering = 0;
+    WRAP_AROUND_FLAG wrapAroundFlag=-1;
 
-    float Accumlative_Error =0;
-    float Last_Error =0;
+    PIDcontroller s_controller={0.8,0,0,0,0};
 
-    long usb_flag = 0 ;
+    while(1)
+    {
+        /*Receive orientation difference relative to current position*/ 
+        xQueueReceive(Queue_Desired_Orientation,
+                             &orientationDifference,
+                             portMAX_DELAY);  
 
-    while(1){
-
-           /* Avoid Handshacking */
-           if (usb_flag == 0)
-           {
-               usb_flag = 1 ;
-               xQueueReceive(Queue_Desired_Orientation,
-                             &f_Refernece_Orientation,
+        /*Receive current orientation*/
+        xQueueReceive(Queue_Current_Orientation,
+                             &currentOrientation,
                              portMAX_DELAY);
-           }
+        
+        /*Calculate desired orientation relative to current orientation and check if a wrap around occurs*/
+        desiredOrientation = currentOrientation + orientationDifference;
+        wrapAroundFlag=int8_getOrientationWrapAroundFlag(currentOrientation,desiredOrientation);
 
-           if (usb_flag == 1)
-           {
-               usb_flag = 2 ;
+        /*Apply PID control to recieved system inputs*/
+        while(1)
+        {
+            /*check if a new set point is received*/
+            float newOrientationDifference;
+            if(xQueuePeek(Queue_Desired_Orientation,&newOrientationDifference,portMAX_DELAY))  
+                if(abs(orientationDifference-newOrientationDifference)>ERROR_FACTOR)
+                {
+                    s_controller.lastError=0;
+                    s_controller.accumlativeError=0;
+                    break;
+                }
 
-               xQueueReceive(Queue_Desired_Orientation,
-                             &f_Refernece_Orientation,
-                             portMAX_DELAY);
-
-               f_Desired_Orientation = getDesired (f_Current_Orientation,f_Refernece_Orientation);
-           }
-
-           xQueueReceive(Queue_Current_Orientation,
-                         &f_Current_Orientation,
-                         0);
-
-           f_Steering = f_DecodingOrientIntoSteering(f_Refernece_Orientation) ;
-
-           l_Steps = (long)((f_Steering) / STEERING_STEP);
-
-           xQueueOverwrite(Queue_steering,&l_Steps);
-
-           do{
-               if(xQueueReceive(Queue_Desired_Orientation,&f_Refernece_Orientation,0) == pdPASS){
-                   break;
-               }
-               vTaskDelay(20);
-
-               xQueueReceive(Queue_Current_Orientation,
-                             &f_Current_Orientation,
+            /*else keep applying PID control on old set point*/
+            xQueueReceive(Queue_Current_Orientation,
+                             &currentOrientation,
                              portMAX_DELAY);
 
-               f_Steering = f_PID_Steering(f_Desired_Orientation ,
-                                           f_Current_Orientation ,
-                                           &Accumlative_Error,
-                                           &Last_Error);
+            /*adjust desired orientation if wrap around happens*/
+            if(wrapAroundFlag != -1)
+                v_adjustDesiredOrientaion(wrapAroundFlag,currentOrientation,&desiredOrientation);
+            
+            pidOrientationOutput=f_PID_control(&s_controller,desiredOrientation ,currentOrientation);
+            
+            /*Change orientation degrees to motor steering steps and checks for direction*/
+            motorSteering=f_DecodeOrientationIntoSteering(pidOrientationOutput);
+            xQueueOverwrite(Queue_steering,&motorSteering);
 
-               l_Steps = (long)((f_Steering) / STEERING_STEP);
+            /*Delay task to allow receiving new inputs to system and to allow motor task to be scheduled*/
+             vTaskDelay(20);
+        }
 
-               xQueueOverwrite(Queue_steering,&l_Steps);
-
-           }while(1);
-
-           f_Desired_Orientation = getDesired (f_Current_Orientation,f_Refernece_Orientation);
-
-           Accumlative_Error = 0;
-           Last_Error = 0;
-       }
+    }
 }
