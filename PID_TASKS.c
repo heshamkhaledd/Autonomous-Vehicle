@@ -80,11 +80,12 @@ void vTask_PID(void * pvParameters){
         wrapAroundFlag=int8_getOrientationWrapAroundFlag(currentOrientation,desiredOrientation);
 
         /*Apply PID control to recieved system inputs*/
+        float newOrientationDifference;
         while(1)
         {
             /*check if a new set point is received*/
-            float newOrientationDifference;
-            if(xQueuePeek(Queue_Desired_Orientation,&newOrientationDifference,portMAX_DELAY))  
+            if(xQueuePeek(Queue_Desired_Orientation,&newOrientationDifference,0))  
+            /*TODO::check if this condition is valid*/
                 if(abs(orientationDifference-newOrientationDifference)>ERROR_FACTOR)
                 {
                     s_controller.lastError=0;
@@ -101,7 +102,7 @@ void vTask_PID(void * pvParameters){
             if(wrapAroundFlag != -1)
                 v_adjustDesiredOrientaion(wrapAroundFlag,currentOrientation,&desiredOrientation);
             
-            pidOrientationOutput=f_PID_control(&s_controller,desiredOrientation ,currentOrientation);
+            pidOrientationOutput=f_PID_control(&s_controller ,currentOrientation, desiredOrientation);
             
             /*Change orientation degrees to motor steering steps and checks for direction*/
             motorSteering=f_DecodeOrientationIntoSteering(pidOrientationOutput);
