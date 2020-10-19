@@ -131,7 +131,7 @@ void State_Decoding (uint8_t * Data, uint8_t Module)
                         default:
                                 error_flag = 1;
                     }
-
+                    break;
         case UART_MODULE:
                     switch(Data[letter_index])
                     {
