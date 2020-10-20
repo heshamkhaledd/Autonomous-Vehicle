@@ -8,7 +8,6 @@
  *
  ******************************************************************************/
 #include "Orientation.h"
-#include "UART.h"
 #include "UART_TASK.h"
 
 

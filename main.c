@@ -60,7 +60,6 @@
 #include "State_Decode.h"
 #include "STEPPER_TASKS.h"
 #include "UART_TASK.h"
-#include "UART.h"
 
 /* Queues handles declarations */
 QueueHandle_t Queue_Feedback_Orientation;
