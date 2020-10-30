@@ -125,8 +125,8 @@ void vTask_Stepper(void *pvParameters)
                          driver_enable_pin);
 
     /* initial condition of the motor*/
-    int32_t steps_current = 0;
-    int32_t  steps_desired = 0;
+    int32_t movedSteps=0;
+    int32_t  stepsDesired = 0;
 
     while(1)
     {
@@ -134,70 +134,38 @@ void vTask_Stepper(void *pvParameters)
         /* QUEUE BLOCKING */
         /* Blocks the task until it receives a new angle */
         xQueueReceive(Queue_steps_desired,
-                      &steps_desired,
+                      &stepsDesired,
                       portMAX_DELAY);
+        
+        movedSteps=0;
 
-        /* Loop if the angles not equal*/
-        while (steps_desired != steps_current){
-
-            /* QUEUE non-BLOCKING */
-            /* check if there is a new angle */
-            xQueueReceive(Queue_steps_desired,
-                          &steps_desired,
-                          0);
-
-            if( steps_desired > steps_current )
-            {
-
+        while(movedSteps != stepsDesired)
+        {
+            if(xQueuePeek(Queue_steps_desired,&stepsDesired,0))
+                break;
+                
+            if(stepsDesired<0)
                 /* make a low logic (LEFT) on direction pin. */
                 MAP_GPIOPinWrite(driver_port_base, driver_direction_pin, ~driver_direction_pin);
-
-                /* making a high pulse on pulse pin to make a step.
-                 * making pulse start by making a rising edge. */
-                MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, driver_pulse_pin);
-
-                /* delay to recognise the high pulse. */
-                vTaskDelay(driver_delay);
-
-                /* end of pulse by making a falling edge */
-                MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, ~driver_pulse_pin);
-
-                /* delay before another pulse. */
-                vTaskDelay(driver_delay);
-
-                /* set current angle to the new angle by adding a step. */
-                steps_current++ ;
-            }
-
-            /* else if the current Angle greater than desired Angle by a step ( 1.8 degree) or more ,
-             * make a step in right direction. */
-            else if( steps_desired < steps_current)
-            {
-                /* set direction to right.
-                 * ui8_steering_direction = LEFT ;
-                 * set direction to left.
-                 * make a high logic (RIGHT) on direction pin.
-                 */
+            else
                 MAP_GPIOPinWrite(driver_port_base, driver_direction_pin, driver_direction_pin);
 
-                /* making a high pulse on pulse pin to make a step.
-                 * making pulse start by making a rising edge. */
-                MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, driver_pulse_pin);
+            /* making a high pulse on pulse pin to make a step.
+            * making pulse start by making a rising edge. */
+            MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, driver_pulse_pin);
 
-                /* delay to recognise the high pulse. */
-                vTaskDelay(driver_delay);
+            /* delay to recognise the high pulse. */
+            vTaskDelay(driver_delay);
 
-                /* end of pulse by making a falling edge. */
-                MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, ~driver_pulse_pin);
+            /* end of pulse by making a falling edge */
+            MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, ~driver_pulse_pin);
 
-                /* delay before another pulse. */
-                vTaskDelay(driver_delay);
+            /* delay before another pulse. */
+            vTaskDelay(driver_delay);
 
-                /* set current angle to the new angle by subtracting a step. */
-                steps_current-- ;
-            }
-            else break;
-
+            /* set current angle to the new angle by adding a step. */
+            movedSteps++ ;
+            
         }
     }
 }
