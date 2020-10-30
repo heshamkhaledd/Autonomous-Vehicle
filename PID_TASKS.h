@@ -27,6 +27,8 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 
+#include <stdlib.h>
+
 #include "orientationAndSteeringUtils.h"
 
 /*******************************************************************************
