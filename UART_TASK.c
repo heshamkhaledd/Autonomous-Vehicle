@@ -66,7 +66,7 @@ void vTask_UART(void *pvParameters)
             UART_Received_Frame[index] = UARTCharGet(UART1_BASE); /* Get the received char */
 
             /* If the received character is a letter. The frame is completed, we must start decoding it */
-            if (UART_Received_Frame[index] == 'o' || UART_Received_Frame[index] == 'O')
+            if (UART_Received_Frame[index] == 'r' || UART_Received_Frame[index] == 'R')
             {
                 UART_Received_Frame[++index] = '\0';
                 break;

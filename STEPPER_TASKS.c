@@ -9,6 +9,18 @@
  ******************************************************************************/
 #include "STEPPER_TASKS.h"
 
+#define MAX_POSITIVE 200
+#define MAX_NEGATIVE -200
+
+static volatile StepperConfig Steering_Args = {STEERING_DRIVER_PORT_CLOCK,
+                                               STEERING_DRIVER_PORT_BASE,
+                                               STEERING_PULSE_PIN,
+                                               STEERING_DIRECTION_PIN,
+                                               STEERING_ENABLE_PIN,
+                                               STEERING_STEP_DELAY
+                                              };
+
+static volatile StepperConfig *steeringPtr = &Steering_Args;
 
 
 /******************************************************************************
@@ -21,29 +33,28 @@
  * Return:      void
  *
  *****************************************************************************/
-static void vInit_Stepper_Driver(uint32_t driver_port_clock,
-                                 uint32_t driver_port_base,
-                                 uint8_t driver_pulse_pin,
-                                 uint8_t driver_direction_pin,
-                                 uint8_t driver_enable_pin)
+static void vInit_Stepper_Driver(void)
 {
-    MAP_SysCtlPeripheralEnable(driver_port_clock);                      /* Enable the clock to GPIO port that is used for the steering stepper driver. */
+    /* Enable the clock to GPIO port that is used for the steering stepper driver. */
+    MAP_SysCtlPeripheralEnable(steeringPtr->Port_Clock);
 
-    while( !MAP_SysCtlPeripheralReady(driver_port_clock));              /* Check if the peripheral access is enabled. */
+    /* Check if the peripheral access is enabled. */
+    while( !MAP_SysCtlPeripheralReady(steeringPtr->Port_Clock));
 
     /* Enable the GPIO pin for steering stepper driver pulse.
      * --> Set the direction as output, and enable the GPIO pin for digital function. */
-    MAP_GPIOPinTypeGPIOOutput(driver_port_base, driver_pulse_pin) ;
+    MAP_GPIOPinTypeGPIOOutput(steeringPtr->Port_Base, steeringPtr->Pulse_Pin);
 
     /* Enable the GPIO pin for steering stepper driver direction.
      * --> Set the direction as output, and enable the GPIO pin for digital function. */
-    MAP_GPIOPinTypeGPIOOutput(driver_port_base, driver_direction_pin) ;
+    MAP_GPIOPinTypeGPIOOutput(steeringPtr->Port_Base, steeringPtr->Direction_Pin);
 
     /* Enable the GPIO pin for steering stepper driver enable.
      * --> Set the direction as output, and enable the GPIO pin for digital function. */
-    MAP_GPIOPinTypeGPIOOutput(driver_port_base, driver_enable_pin) ;
+    MAP_GPIOPinTypeGPIOOutput(steeringPtr->Port_Base, steeringPtr->Enable_Pin) ;
 
-    MAP_GPIOPinWrite(driver_port_base, driver_enable_pin, driver_enable_pin); /* Initialise Enable pin by HIGH to enable rotating steering manually. */
+    /* Initialise Enable pin by HIGH to enable rotating steering manually. */
+    MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Enable_Pin, steeringPtr->Enable_Pin);
 }
 
 
@@ -59,27 +70,17 @@ static void vInit_Stepper_Driver(uint32_t driver_port_clock,
  *****************************************************************************/
 void vInit_Steppers_Tasks(void)
 {
-
-    static stepper_params steering_structure;
-
-    /* Parameters are defined in the ".h" file */
-    steering_structure.Queue_steps_desired=Queue_steering;
-    steering_structure.driver_port_clock=STEERING_DRIVER_PORT_CLOCK;
-    steering_structure.driver_port_base=STEERING_DRIVER_PORT_BASE;
-    steering_structure.driver_direction_pin=STEERING_DIRECTION_PIN;
-    steering_structure.driver_enable_pin=STEERING_ENABLE_PIN;
-    steering_structure.driver_pulse_pin=STEERING_PULSE_PIN;
-    steering_structure.driver_delay=STEERING_STEP_DELAY;
+    /* Initialize Stepper Driver HW */
+    vInit_Stepper_Driver();
 
 
     /* Task creation */
     xTaskCreate( vTask_Stepper,                             /* Task Address       */
                  "steering_task",                           /* Task name          */
                  STEPPER_vTASK_STACK_DEPTH,                 /* Size of the stack. */
-                 &steering_structure,                       /* Task Parameters.   */
+                 NULL,                                      /* Task Parameters.   */
                  configMAX_PRIORITIES-STEERING_vTASK_PRIO,  /* Task Priority .    */
                  NULL);                                     /* Task handle        */
-
 }
 
 
@@ -98,32 +99,6 @@ void vInit_Steppers_Tasks(void)
 void vTask_Stepper(void *pvParameters)
 {
 
-    /*
-     * Queue handler
-     * driver port clock
-     * driver port base
-     * driver pulse pin
-     * driver direction pin
-     * driver enable pin
-     * driver delay
-     */
-
-    /* Initialise Task Parameters */
-    QueueHandle_t Queue_steps_desired =((stepper_params *)pvParameters)->Queue_steps_desired;
-    uint32_t driver_port_clock =((stepper_params *)pvParameters)->driver_port_clock;
-    uint32_t driver_port_base=((stepper_params *)pvParameters)->driver_port_base;
-    uint8_t driver_pulse_pin=((stepper_params *)pvParameters)->driver_pulse_pin;
-    uint8_t driver_direction_pin=((stepper_params *)pvParameters)->driver_direction_pin;
-    uint8_t driver_enable_pin=((stepper_params *)pvParameters)->driver_enable_pin;
-    uint8_t driver_delay=((stepper_params *)pvParameters)->driver_delay;
-
-    /* Initialize the port and driver */
-    vInit_Stepper_Driver(driver_port_clock,
-                         driver_port_base,
-                         driver_pulse_pin,
-                         driver_direction_pin,
-                         driver_enable_pin);
-
     /* initial condition of the motor*/
     int32_t movedSteps=0;
     int32_t  stepsDesired = 0;
@@ -133,38 +108,49 @@ void vTask_Stepper(void *pvParameters)
 
         /* QUEUE BLOCKING */
         /* Blocks the task until it receives a new angle */
-        xQueueReceive(Queue_steps_desired,
+        xQueueReceive(Queue_steering,
                       &stepsDesired,
                       portMAX_DELAY);
         
-        movedSteps=0;
 
         while(movedSteps != stepsDesired)
         {
-            if(xQueuePeek(Queue_steps_desired,&stepsDesired,0))
+            if(xQueuePeek(Queue_steering,&stepsDesired,0))
                 break;
                 
-            if(stepsDesired<0)
-                /* make a low logic (LEFT) on direction pin. */
-                MAP_GPIOPinWrite(driver_port_base, driver_direction_pin, ~driver_direction_pin);
+            if(stepsDesired>0)
+            {
+                movedSteps++;
+                if (movedSteps > MAX_POSITIVE)
+                    break;
+                else
+                    /* make a low logic (LEFT) on direction pin. */
+                    MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, ~(steeringPtr->Direction_Pin));
+            }
             else
-                MAP_GPIOPinWrite(driver_port_base, driver_direction_pin, driver_direction_pin);
+            {
+                movedSteps--;
+                if (movedSteps < MAX_NEGATIVE)
+                    break;
+                else
+                    MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, steeringPtr->Direction_Pin);
+            }
 
             /* making a high pulse on pulse pin to make a step.
             * making pulse start by making a rising edge. */
-            MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, driver_pulse_pin);
+            MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Pulse_Pin, steeringPtr->Pulse_Pin);
 
             /* delay to recognise the high pulse. */
-            vTaskDelay(driver_delay);
+            vTaskDelay(steeringPtr->Driver_Delay);
 
             /* end of pulse by making a falling edge */
-            MAP_GPIOPinWrite(driver_port_base, driver_pulse_pin, ~driver_pulse_pin);
+            MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Pulse_Pin, ~(steeringPtr->Pulse_Pin));
 
             /* delay before another pulse. */
-            vTaskDelay(driver_delay);
+            vTaskDelay(steeringPtr->Driver_Delay);
 
             /* set current angle to the new angle by adding a step. */
-            movedSteps++ ;
+            //movedSteps++ ;
             
         }
     }

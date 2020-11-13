@@ -34,7 +34,7 @@ typedef int8_t WRAP_AROUND_FLAG;
  *                                 Macros                                    *
  *******************************************************************************/
 /*Checks if passed angle is a positive angle ranging between 0 to 180 degrees*/
-#define CHECK_POSITIVE_ANGLE(ANGLE) (ANGLE>=0 && ANGLE>=180)
+#define CHECK_POSITIVE_ANGLE(ANGLE) (ANGLE>=0 && ANGLE<=180)
 
 /*Checks if passed angle is a negative angle ranging between -180 to 0*/
 #define CHECK_NEGATIVE_ANGLE(ANGLE) (ANGLE>-180 && ANGLE<0)
