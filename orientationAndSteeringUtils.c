@@ -72,12 +72,12 @@ void v_adjustDesiredOrientaion(WRAP_AROUND_FLAG a_wrapAroundFlag, float currentO
  ************************************************************************************/
 float f_DecodeOrientationIntoSteering (float a_desiredOrientation)
 {
+    /*Check for wheel orientation saturartion*/
+    a_desiredOrientation=a_desiredOrientation>MAX_ORIENTATION ? MAX_ORIENTATION:a_desiredOrientation;
+    a_desiredOrientation=a_desiredOrientation<MIN_ORIENTATION ? MIN_ORIENTATION:a_desiredOrientation;
+
     float steeringDegrees=a_desiredOrientation * (float)ORIENT_TO_STEERING_PARAM;
     
-    /*Check for Steering saturartion*/
-    steeringDegrees=steeringDegrees>MAX_STEERING ? MAX_STEERING:steeringDegrees;
-    steeringDegrees=steeringDegrees<MIN_STEERING ? MIN_STEERING:steeringDegrees;
-
     /*Multiplying by motor factor*/
     steeringDegrees= (long)((steeringDegrees) / STEERING_STEP);
     return steeringDegrees ;

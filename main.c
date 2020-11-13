@@ -63,9 +63,7 @@
 #include "UART.h"
 
 /* Queues handles declarations */
-QueueHandle_t Queue_Feedback_Orientation;
 QueueHandle_t Queue_Desired_Orientation;
-QueueHandle_t Queue_steering;
 QueueHandle_t Queue_Current_Orientation;
 
 
@@ -82,15 +80,12 @@ int main(void)
     MAP_IntMasterEnable();                                                                      /* Enable Global Interrupt-bit */
 
     /* Creating the Queues and storing their addresses in their handles */
-    Queue_Feedback_Orientation = xQueueCreate(1,4);
     Queue_Current_Orientation = xQueueCreate(1,4);
     Queue_Desired_Orientation = xQueueCreate(1,4);
-    Queue_steering = xQueueCreate(1,4);
 
 
     /* Initializing System's modules */
     vInit_Steppers_Tasks();
-    vInit_PID();
     vInit_USBTasks();
     UART1_Init(9600);
     vInit_UART();

@@ -9,9 +9,6 @@
  ******************************************************************************/
 #include "STEPPER_TASKS.h"
 
-#define MAX_POSITIVE 200
-#define MAX_NEGATIVE -200
-
 static volatile StepperConfig Steering_Args = {STEERING_DRIVER_PORT_CLOCK,
                                                STEERING_DRIVER_PORT_BASE,
                                                STEERING_PULSE_PIN,
@@ -100,6 +97,7 @@ void vTask_Stepper(void *pvParameters)
 {
 
     /* initial condition of the motor*/
+    float desiredOrientation=0;
     int32_t movedSteps=0;
     int32_t  stepsDesired = 0;
 
@@ -107,33 +105,29 @@ void vTask_Stepper(void *pvParameters)
     {
 
         /* QUEUE BLOCKING */
-        /* Blocks the task until it receives a new angle */
-        xQueueReceive(Queue_steering,
-                      &stepsDesired,
+        /* Blocks the task until it receives a new desired angle */
+        xQueueReceive(Queue_Desired_Orientation,
+                      &desiredOrientation,
                       portMAX_DELAY);
-        
+
+        stepsDesired=f_DecodeOrientationIntoSteering(desiredOrientation);
 
         while(movedSteps != stepsDesired)
         {
-            if(xQueuePeek(Queue_steering,&stepsDesired,0))
+            if(xQueuePeek(Queue_Desired_Orientation,&desiredOrientation,0))
                 break;
                 
-            if(stepsDesired>0)
+            if(stepsDesired>movedSteps)
             {
                 movedSteps++;
-                if (movedSteps > MAX_POSITIVE)
-                    break;
-                else
-                    /* make a low logic (LEFT) on direction pin. */
-                    MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, ~(steeringPtr->Direction_Pin));
+                /* Set direction to left*/
+                MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, ~(steeringPtr->Direction_Pin));
             }
             else
             {
                 movedSteps--;
-                if (movedSteps < MAX_NEGATIVE)
-                    break;
-                else
-                    MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, steeringPtr->Direction_Pin);
+                /* Set direction to right*/
+                MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, steeringPtr->Direction_Pin);
             }
 
             /* making a high pulse on pulse pin to make a step.
@@ -148,10 +142,6 @@ void vTask_Stepper(void *pvParameters)
 
             /* delay before another pulse. */
             vTaskDelay(steeringPtr->Driver_Delay);
-
-            /* set current angle to the new angle by adding a step. */
-            //movedSteps++ ;
-            
         }
     }
 }

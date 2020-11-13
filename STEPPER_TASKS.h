@@ -29,7 +29,7 @@
 #include <timers.h>
 #include <semphr.h>
 #include <queue.h>
-
+#include "orientationAndSteeringUtils.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *
@@ -78,8 +78,8 @@
  *                          Variables                            *
 ******************************************************************/
 
- /* Queue Handlers for data from USB */
-extern QueueHandle_t Queue_steering;
+ /* Queue Handlers for data from USB: The desired orientation of the vehicle */
+extern QueueHandle_t Queue_Desired_Orientation;
 
 
 /*******************************************************************************
