@@ -16,7 +16,7 @@
 #include <timers.h>
 #include <semphr.h>
 #include <queue.h>
-
+#include <stdlib.h>
 #include <stdint.h>
 
 #include "PID_Control.h"

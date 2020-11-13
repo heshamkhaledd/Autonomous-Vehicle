@@ -65,14 +65,13 @@
 
   /* Structure of the different parameters used in each task */
      typedef struct {
-         QueueHandle_t  Queue_steps_desired;
-         uint32_t driver_port_clock;
-         uint32_t driver_port_base;
-         uint8_t driver_pulse_pin;
-         uint8_t driver_direction_pin;
-         uint8_t driver_enable_pin;
-         uint8_t driver_delay;
-     } stepper_params;
+         uint32_t   Port_Clock;
+         uint32_t   Port_Base;
+         uint8_t    Pulse_Pin;
+         uint8_t    Direction_Pin;
+         uint8_t    Enable_Pin;
+         uint8_t    Driver_Delay;
+     }StepperConfig;
 
 
 /*****************************************************************
@@ -80,14 +79,15 @@
 ******************************************************************/
 
  /* Queue Handlers for data from USB */
-     extern QueueHandle_t Queue_steering;
+extern QueueHandle_t Queue_steering;
 
 
 /*******************************************************************************
 *                          Functions Prototypes                                *
 *******************************************************************************/
+static void vInit_Stepper_Driver(void);
 extern void vInit_Steppers_Tasks();
-extern void vTask_Stepper(void *);
+void vTask_Stepper(void *pvParameters);
 
 
  
