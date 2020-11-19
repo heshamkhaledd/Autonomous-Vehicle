@@ -72,6 +72,7 @@ static void USB_HardwareConfiguration (void )
 
 uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue, void *pvMsgData)
 {
+    tLineCoding *pvdata = pvMsgData;
     switch(ui32Event)
        {
 
@@ -94,7 +95,8 @@ uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue
            case USBD_CDC_EVENT_GET_LINE_CODING:
            case USBD_CDC_EVENT_SET_LINE_CODING:
                /*setting the USB serial configurations*/
-               USB_GetLineCoding(pvMsgData);
+
+               USB_GetLineCoding(pvdata);
                break;
 
 

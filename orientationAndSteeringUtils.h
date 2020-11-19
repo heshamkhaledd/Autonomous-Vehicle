@@ -17,8 +17,8 @@
  *                           Preprocessor Definies                             *
  *******************************************************************************/
 /* steering Configurations */
-#define STEERING_STEP 1.8
-#define ORIENT_TO_STEERING_PARAM 24
+#define STEERING_STEP 0.45
+#define ORIENT_TO_STEERING_PARAM 16
 #define WRAP_AROUND_CORRECTION_FACTOR 360.0f
 
 #define MAX_ORIENTATION 45

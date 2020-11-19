@@ -76,9 +76,9 @@ float f_DecodeOrientationIntoSteering (float a_desiredOrientation)
     a_desiredOrientation=a_desiredOrientation>MAX_ORIENTATION ? MAX_ORIENTATION:a_desiredOrientation;
     a_desiredOrientation=a_desiredOrientation<MIN_ORIENTATION ? MIN_ORIENTATION:a_desiredOrientation;
 
-    float steeringDegrees=a_desiredOrientation * (float)ORIENT_TO_STEERING_PARAM;
+    float steeringDegrees=a_desiredOrientation / (float)ORIENT_TO_STEERING_PARAM;
     
     /*Multiplying by motor factor*/
-    steeringDegrees= (long)((steeringDegrees) / STEERING_STEP);
+    steeringDegrees= (long)((a_desiredOrientation) / STEERING_STEP);
     return steeringDegrees ;
 }
