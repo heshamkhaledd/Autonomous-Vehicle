@@ -61,9 +61,9 @@ void vTask_UART(void *pvParameters)
         xSemaphoreTake(Sem_UARTReceive,portMAX_DELAY);
 
         /* Check if there received char in the buffer or not */
-        while (UARTCharsAvail(UART1_BASE))
+        while (UARTCharsAvail(UART0_BASE))
         {
-            UART_Received_Frame[index] = UARTCharGet(UART1_BASE); /* Get the received char */
+            UART_Received_Frame[index] = UARTCharGet(UART0_BASE); /* Get the received char */
 
             /* If the received character is a letter. The frame is completed, we must start decoding it */
             if (UART_Received_Frame[index] == 'r' || UART_Received_Frame[index] == 'R')

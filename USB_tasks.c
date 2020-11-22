@@ -154,6 +154,10 @@ void vTASK_USBReceive (void *pvParameters)
             State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
             i=0;
         }
+        else if (dataFromHost[i] == 'e' || dataFromHost[i]=='E')
+        {
+            i = 0;
+        }
         else
         {
             i++;

@@ -21,8 +21,9 @@
 #define ORIENT_TO_STEERING_PARAM 16
 #define WRAP_AROUND_CORRECTION_FACTOR 360.0f
 
-#define MAX_ORIENTATION 45
-#define MIN_ORIENTATION -45
+/* These Values are Tested Physically. Date: 22/11/2020 */
+#define MAX_ORIENTATION 90
+#define MIN_ORIENTATION -85
 
 /*Orientation related defines*/
 #define POSITIVE_TO_NEGATIVE_WRAP_AROUND    1

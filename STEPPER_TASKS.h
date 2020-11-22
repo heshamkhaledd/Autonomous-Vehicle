@@ -80,6 +80,7 @@
 
  /* Queue Handlers for data from USB: The desired orientation of the vehicle */
 extern QueueHandle_t Queue_Desired_Orientation;
+extern QueueHandle_t Queue_Current_Orientation;
 
 
 /*******************************************************************************
