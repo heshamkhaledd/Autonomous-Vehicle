@@ -99,7 +99,7 @@ void vTask_Stepper(void *pvParameters)
     /* initial condition of the motor*/
     float desiredOrientation=0;
     int32_t movedSteps=0;
-    int32_t  stepsDesired = 0;
+    long  stepsDesired = 0;
 
     while(1)
     {
