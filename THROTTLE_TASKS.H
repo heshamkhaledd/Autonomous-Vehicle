@@ -11,6 +11,26 @@
 #ifndef THROTTLE_TASKS_H_
 #define THROTTLE_TASKS_H_
 
+#include "inc/hw_ints.h"
+#include <stdint.h>
+#include <stdbool.h>
+#include "inc/hw_memmap.h"
+#include "driverlib/debug.h"
+#include "driverlib/gpio.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/rom.h"
+#include "driverlib/rom_map.h"
+#include "inc/hw_uart.h"
+#include "driverlib/uart.h"
+
+#include <FreeRTOS.h>
+#include <task.h>
+#include <timers.h>
+#include <semphr.h>
+#include <queue.h>
+#include "FreeRTOSConfig.h"
+#include "portable.h"
+
 /*******************************************************************************
  *                           Preprocessor Definies                             *
  *******************************************************************************/
@@ -19,14 +39,27 @@
 #define THROTTLE_vTASK_STACK_DEPTH 80
 
 /* Throttle Driver Port&Pins configurations */
- #define THROTLE_DRIVER_PORT_CLOCK SYSCTL_PERIPH_GPIOA
- #define THROTLE_DRIVER_PORT_BASE GPIO_PORTA_BASE
- #define THROTLE_PULSE_PIN GPIO_PIN_2
- #define THROTLE_DIRECTION_PIN GPIO_PIN_3
- #define THROTLE_ENABLE_PIN GPIO_PIN_4
- #define THROTLE_STEP_DELAY 10
+ #define THROTTLE_DRIVER_PORT_CLOCK      SYSCTL_PERIPH_GPIOE
+ #define THROTTLE_DRIVER_PORT_BASE       GPIO_PORTE_BASE
+ #define THROTTLE_PULSE_PIN              GPIO_PIN_1
+ #define THROTTLE_DIRECTION_PIN          GPIO_PIN_2
+ #define THROTTLE_ENABLE_PIN             GPIO_PIN_3
+ #define THROTTLE_STEP_DELAY             10
+ #define THROTTLE_vTASK_PRIO             2
 
- #define THROTLE_vTASK_PRIO 2
+/* Stepper steps & angles parameters */
+/* 800 pulse/rev step 2.22 CONVERT_TO_ANGLES 0.45  */
+/* 3200 pulse/rev step 8.69 CONVERT_TO_ANGLES 0.1125*/
+/* 1600 pulse/rev step 4.44 CONVERT_TO_ANGLES 0.225*/
+
+#define STEP           2.22 
+#define CONVERT_TO_ANGLES 0.45 
+
+
+#define LOW            0
+/* range from MIN_ANGLE to MAX_ANGLE*/
+#define MAX_ANGLE   15
+#define MIN_ANGLE   -5
 
 
 /****************************************************************
@@ -35,14 +68,13 @@
 
 /* Structure of the different parameters used in each task */
 typedef struct {
-    QueueHandle_t  Queue_steps_desired;
-    uint32_t driver_port_clock;
-    uint32_t driver_port_base;
-    uint8_t driver_pulse_pin;
-    uint8_t driver_direction_pin;
-    uint8_t driver_enable_pin;
-    uint8_t driver_delay;
-} throttle_params;
+    uint32_t   Port_Clock;
+    uint32_t   Port_Base;
+    uint8_t    Pulse_Pin;
+    uint8_t    Direction_Pin;
+    uint8_t    Enable_Pin;
+    uint8_t    Driver_Delay;
+} ThrottleConfig;
 
 
 /*****************************************************************
@@ -50,7 +82,7 @@ typedef struct {
  *****************************************************************/
 
 /* Queue Handlers for data from USB */
-extern QueueHandle_t Queue_throttle;
+extern QueueHandle_t Queue_Throttle_Orientation;
 
 /*******************************************************************************
 *                          Functions Prototypes                                *

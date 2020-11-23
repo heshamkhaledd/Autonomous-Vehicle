@@ -61,11 +61,11 @@
 #include "STEPPER_TASKS.h"
 #include "UART_TASK.h"
 #include "UART.h"
-
+#include "THROTTLE_TASKS.h"
 /* Queues handles declarations */
 QueueHandle_t Queue_Desired_Orientation;
 QueueHandle_t Queue_Current_Orientation;
-
+QueueHandle_t Queue_Throttle_Orientation;
 
 
 int main(void)
@@ -82,10 +82,11 @@ int main(void)
     /* Creating the Queues and storing their addresses in their handles */
     Queue_Current_Orientation = xQueueCreate(1,4);
     Queue_Desired_Orientation = xQueueCreate(1,4);
-
+    Queue_Throttle_Orientation = xQueueCreate(1,4);
 
     /* Initializing System's modules */
     vInit_Steppers_Tasks();
+    vInit_throttle_Tasks();
     vInit_USBTasks();
     //UART1_Init(9600);
     //vInit_UART();

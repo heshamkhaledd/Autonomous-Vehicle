@@ -42,7 +42,7 @@ extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Desired_Orientation;
 extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Current_Orientation;
-
+extern QueueHandle_t Queue_Throttle_Orientation;
 
 /*******************************************************************************
  *                          Functions Prototypes                               *

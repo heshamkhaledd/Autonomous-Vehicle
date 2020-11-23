@@ -148,7 +148,7 @@ void vTASK_USBReceive (void *pvParameters)
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
         USBBufferRead(&g_sRxBuffer,&dataFromHost[i],1);
         USBBufferWrite(&g_sTxBuffer,&dataFromHost[i],1); /*Line to echo the data to putty's terminal*/
-        if(dataFromHost[i] == 'O' || dataFromHost[i] == 'o')
+        if(dataFromHost[i] == 'O' || dataFromHost[i] == 'o' || dataFromHost[i] == 't' || dataFromHost[i] == 'T')
         {
             dataFromHost[i+1] = '\0'; 
             State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
