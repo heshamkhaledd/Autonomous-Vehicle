@@ -8,7 +8,10 @@
  *
  ******************************************************************************/
 #include "USB_tasks.h"
-
+#define TESTING_ON_LAPTOP   /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
+#define PACKET_SIZE 7      /*If we connect the board to Xavier we need to define the received packet size, 
+                                initially it is 10 bytes (XXXoXXT) X stands for ascii numbers or minus sign. 
+                                Note: We can change it from here.*/
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
 bool g_bUSBConfigured = false;
@@ -140,6 +143,7 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
  * Return:      void
  *
  *****************************************************************************/
+#ifdef TESTING_ON_LAPTOP
 void vTASK_USBReceive (void *pvParameters)
 {
     uint8_t dataFromHost[arr_size],i=0;
@@ -165,7 +169,28 @@ void vTASK_USBReceive (void *pvParameters)
         
     }
 }
+#endif
 
+#ifndef TESTING_ON_LAPTOP 
+void vTASK_USBReceive (void *pvParameters)
+{
+    uint8_t dataFromHost[PACKET_SIZE+1];
+    while(1)
+    {
+        xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
+        USBBufferRead(&g_sRxBuffer,dataFromHost,PACKET_SIZE);
+        //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
+        dataFromHost[PACKET_SIZE]='\0';
+         State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
+        /*Important question:
+        * 1- will the received data be as a one packet that has the data for throttle and steering together?
+        *   -> if yes, we need to edit state_Decoding function to handle something like this ['-','5','t','-','2','4','O','\0']
+        *   -> if No, we won't change state decoding function 
+        *       but we must agree on a fixed packet size for the steering and throttling packet.
+        * */
+    }
+}
+#endif
 /******************************************************************************
  *
  * Function Name: vTASK_USBTransmit
