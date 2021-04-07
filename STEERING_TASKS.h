@@ -30,6 +30,7 @@
 #include <semphr.h>
 #include <queue.h>
 #include "orientationAndSteeringUtils.h"
+#include "STEPPER.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *
@@ -59,20 +60,6 @@
  #define BRAKES_vTASK_PRIO 1
 
  
-/****************************************************************
- *                       Structures                             *
-*****************************************************************/
-
-  /* Structure of the different parameters used in each task */
-     typedef struct {
-         uint32_t   Port_Clock;
-         uint32_t   Port_Base;
-         uint8_t    Pulse_Pin;
-         uint8_t    Direction_Pin;
-         uint8_t    Enable_Pin;
-         uint8_t    Driver_Delay;
-     }StepperConfig;
-
 
 /*****************************************************************
  *                          Variables                            *
@@ -86,7 +73,6 @@ extern QueueHandle_t Queue_Current_Orientation;
 /*******************************************************************************
 *                          Functions Prototypes                                *
 *******************************************************************************/
-static void vInit_Stepper_Driver(void);
 extern void vInit_Steppers_Tasks();
 void vTask_Stepper(void *pvParameters);
 

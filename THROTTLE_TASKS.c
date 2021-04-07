@@ -10,46 +10,15 @@
 
 #include "THROTTLE_TASKS.h"
 
-static volatile ThrottleConfig Throttle_Args = {THROTTLE_DRIVER_PORT_CLOCK,
+static StepperConfig Throttle_Args = {THROTTLE_DRIVER_PORT_CLOCK,
                                                 THROTTLE_DRIVER_PORT_BASE,
                                                 THROTTLE_PULSE_PIN,
                                                 THROTTLE_DIRECTION_PIN,
                                                 THROTTLE_ENABLE_PIN,
                                                 THROTTLE_STEP_DELAY};
 
-static volatile ThrottleConfig *throttlePtr = &Throttle_Args;
-/******************************************************************************
- *
- * Function Name: vInit_Throttle_Drive
- *
- * Description: For enabling and initialising the port/pins configurations and clock
- *
- * Arguments:
- * Return:      void
- *
- *****************************************************************************/
-static void vInit_Throttle_Driver()
-{
+static StepperConfig *throttlePtr = &Throttle_Args;
 
-    MAP_SysCtlPeripheralEnable(throttlePtr->Port_Clock); /* Enable the clock to GPIO port that is used for the throttle stepper driver. */
-
-    while (!MAP_SysCtlPeripheralReady(throttlePtr->Port_Clock)); /* Check if the peripheral access is enabled. */
-
-    /* Enable the GPIO pin for throttle stepper driver pulse.
-        * --> Set the direction as output, and enable the GPIO pin for digital function. */
-    MAP_GPIOPinTypeGPIOOutput(throttlePtr->Port_Base, throttlePtr->Pulse_Pin);
-
-    /* Enable the GPIO pin for throttle stepper driver direction.
-        * --> Set the direction as output, and enable the GPIO pin for digital function. */
-    MAP_GPIOPinTypeGPIOOutput(throttlePtr->Port_Base, throttlePtr->Direction_Pin);
-
-    /* Enable the GPIO pin for throttle stepper driver enable.
-        * --> Set the direction as output, and enable the GPIO pin for digital function. */
-    MAP_GPIOPinTypeGPIOOutput(throttlePtr->Port_Base, throttlePtr->Enable_Pin);
-
-    /*Initialize Enable pin to be 0*/
-    MAP_GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Enable_Pin, 0);
-}
 /******************************************************************************
  *
  * Function Name: vTask_throttle
@@ -166,7 +135,7 @@ void vTask_throttle(void *pvParameters)
 void vInit_throttle_Tasks()
 {
 
-    vInit_Throttle_Driver();
+    vInit_Stepper_Driver(throttlePtr);
 
                 
     /* Task creation */

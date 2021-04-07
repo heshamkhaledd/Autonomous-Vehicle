@@ -30,7 +30,7 @@
 #include <queue.h>
 #include "FreeRTOSConfig.h"
 #include "portable.h"
-
+#include "STEPPER.h"
 /*******************************************************************************
  *                           Preprocessor Definies                             *
  *******************************************************************************/
@@ -60,21 +60,6 @@
 /* range from MIN_ANGLE to MAX_ANGLE*/
 #define MAX_ANGLE   15
 #define MIN_ANGLE   -5
-
-
-/****************************************************************
- *                        Structures
- ***************************************************************/
-
-/* Structure of the different parameters used in each task */
-typedef struct {
-    uint32_t   Port_Clock;
-    uint32_t   Port_Base;
-    uint8_t    Pulse_Pin;
-    uint8_t    Direction_Pin;
-    uint8_t    Enable_Pin;
-    uint8_t    Driver_Delay;
-} ThrottleConfig;
 
 
 /*****************************************************************
