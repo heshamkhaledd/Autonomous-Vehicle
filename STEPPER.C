@@ -45,8 +45,9 @@ int32_t uMove_Stepper(QueueHandle_t Queue_Desired_Angle, int32_t movedSteps, lon
     float desiredOrientation;
     while(movedSteps != stepsDesired)
          {
-             if(xQueuePeek(Queue_Desired_Angle,&desiredOrientation,0))
+             if(xQueuePeek(Queue_Desired_Angle,&desiredOrientation,0)){
                  return movedSteps;
+             }
 
              if(stepsDesired>movedSteps)
              {

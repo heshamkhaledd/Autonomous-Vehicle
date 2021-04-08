@@ -33,26 +33,16 @@ static StepperConfig *throttlePtr = &Throttle_Args;
 
 void vTask_throttle(void *pvParameters)
 {
-    /*
-         * Queue handler
-         * driver port clock
-         * driver port base
-         * driver pulse pin
-         * driver direction pin
-         * driver enable pin
-         * driver delay
-         */
 
     /* Initialize Task Parameters */
     QueueHandle_t Queue_angles_desired = Queue_Throttle_Orientation;
-
-    /* variables to convert desired angle to pulses on stepper*/
-    uint16_t end;
-    uint16_t pulse_counter;
-    float counter = 0;
+    /*stores the current angle if needed in feedback*/
     float current_angle;
-    float relate_angle;
+    /* stores the desired angle read from queue */
     float desired_angle;
+    /*stores the number of pulses generated on the stepper*/
+    int32_t movedSteps = 0;
+    long stepsDesired;
 
     while (1)
     {
@@ -71,56 +61,13 @@ void vTask_throttle(void *pvParameters)
             desired_angle = MIN_ANGLE;
         }
         /*determine the current angle of the throttle depending on the position of the motor*/
-        current_angle = counter * CONVERT_TO_ANGLES;
+        current_angle = movedSteps * CONVERT_TO_ANGLES;
+        /*convert desried angle into steps or pulses*/
+        stepsDesired = ((STEP) * (desired_angle));
 
-        /*determine the angle needed to be converted to pulses on stepper*/
-        relate_angle = desired_angle - current_angle;
-
-        /*controlling the direction */
-        if (relate_angle >= 0) //if the angle desired is larger than the current
-        {
-
-            /*opening the throttle*/
-            /*convert angles to pulses*/
-            end = ((STEP) * (relate_angle));
-            /* counterclockwise direction*/
-            GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Direction_Pin, LOW);
-            for (pulse_counter = 0; pulse_counter < end; pulse_counter++)
-            {
-
-                /* generating the pulse */
-                GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Pulse_Pin, throttlePtr->Pulse_Pin);
-                vTaskDelay(throttlePtr->Driver_Delay);
-                GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Pulse_Pin, LOW);
-                vTaskDelay(throttlePtr->Driver_Delay);
-                /*detecting the steps moved in this pulse*/
-                counter++;
-            }
-        }
-        else if (relate_angle < 0)
-        {
-            /*closing the throttle*/
-            /*convert angles to pulses*/
-            end = (STEP) * (-relate_angle);
-            /* clockwise direction*/
-            GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Direction_Pin, throttlePtr->Direction_Pin); //setting the direction to clockwise
-
-            for (pulse_counter = 0; pulse_counter < end; pulse_counter++)
-            {
-                /* generating the pulse */
-                GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Pulse_Pin, throttlePtr->Pulse_Pin);
-
-                vTaskDelay(throttlePtr->Driver_Delay); //the delay here is
-                GPIOPinWrite(throttlePtr->Port_Base, throttlePtr->Pulse_Pin, LOW);
-                vTaskDelay(throttlePtr->Driver_Delay);
-
-                /*detecting the steps moved in this pulse*/
-                counter--;
-            }
-        }
+         movedSteps = uMove_Stepper(Queue_angles_desired, movedSteps, stepsDesired, throttlePtr);
     }
 }
-
 /******************************************************************************
  *
  * Function Name: vInit_throttle_Tasks
@@ -142,7 +89,7 @@ void vInit_throttle_Tasks()
     xTaskCreate(vTask_throttle,                             /* Task Address       */
                 "throttle_task",                            /* Task name          */
                 THROTTLE_vTASK_STACK_DEPTH,                 /* Size of the stack. */
-                NULL,                        /* Task Parameters.   */
+                NULL,                                       /* Task Parameters.   */
                 configMAX_PRIORITIES - THROTTLE_vTASK_PRIO, /* Task Priority .    */
                 NULL);                                      /* Task handle        */
 }
