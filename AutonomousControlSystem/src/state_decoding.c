@@ -119,8 +119,8 @@ void State_Decoding (uint8_t * Data, uint8_t Module)
         case USB_MODULE:
                     switch(Data[letter_index])
                     {
-                        case 'O':
-                        case 'o':
+                        case 'R':
+                        case 'r':
                                 xQueueOverwrite(Queue_Desired_Orientation,
                                                 &number);
                                 break;
