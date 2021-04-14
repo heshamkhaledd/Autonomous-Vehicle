@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   State_Decode.h
+ * File Name:   state_decoding.h
  *
  * Description: USB State decoding header file
  *
@@ -10,19 +10,7 @@
 #ifndef STATE_DECODE_H_
 #define STATE_DECODE_H_
 
-
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_memmap.h"
-#include "driverlib/debug.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-#include <stdint.h>
+#include "common_includes.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *

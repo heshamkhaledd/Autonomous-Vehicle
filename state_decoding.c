@@ -1,13 +1,13 @@
  /******************************************************************************
  *
- * File Name:   State_Decode.c
+ * File Name:   state_decoding.c
  *
  * Description: USB State decoding source file
  *
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#include "State_Decode.h"
+#include "state_decoding.h"
 
 uint8_t letter_index = 0;
 

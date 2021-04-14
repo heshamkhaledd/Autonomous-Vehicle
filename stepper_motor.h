@@ -12,24 +12,7 @@
 #ifndef STEPPER_H_
 #define STEPPER_H_
 
-#include "inc/hw_ints.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_memmap.h"
-#include "driverlib/debug.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/rom.h"
-#include "driverlib/rom_map.h"
-#include "inc/hw_uart.h"
-#include "driverlib/uart.h"
-
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
-#include "FreeRTOSConfig.h"
+#include "common_includes.h"
 #include "portable.h"
 
 /****************************************************************

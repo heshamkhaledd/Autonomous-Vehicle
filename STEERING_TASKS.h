@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   STEERING_TASKS.h
+ * File Name:   steering_tasks.h
  *
  * Description: Steering Motor header file, includes the intializing task and
  *              the steering task.
@@ -11,24 +11,9 @@
 #ifndef STEERING_TASKS_H
 #define STEERING_TASKS_H
 
-
-#include "inc/hw_ints.h"
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_memmap.h"
-#include "driverlib/debug.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/rom.h"
-#include "driverlib/rom_map.h"
-
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
-
-#include "STEPPER.h"
+#include "Common_Includes.h"
+#include "orientation_decoding.h"
+#include "stepper_motor.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *

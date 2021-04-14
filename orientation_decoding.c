@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   orientationAndSteeringUtils.c
+ * File Name:   orientation_decoding.c
  *
  * Description: source file for utility functions and definitions
  *              Related to orientation and steering
@@ -8,7 +8,7 @@
  * Date:        10/12/2020
  *
  ******************************************************************************/
-#include "orientationAndSteeringUtils.h"
+#include "orientation_decoding.h"
 
 
 /******************************************************************************

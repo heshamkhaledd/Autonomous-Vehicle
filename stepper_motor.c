@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * File Name:   STEPPER.C
+ * File Name:   stepper_motor.C
  *
  * Description: Stepper motor source file includes functions that intializes and
  *              controls a stepper motor.
@@ -9,7 +9,7 @@
  *
  ******************************************************************************/
 
-#include "STEPPER.h"
+#include "stepper_motor.h"
 
 /******************************************************************************
  *

@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   PID_TASKS.h
+ * File Name:   PID_tasks.h
  *
  * Description: PID header file to initialize and start the PID Control tasks.
  *
@@ -11,25 +11,9 @@
 #ifndef PID_TASKS_H_
 #define PID_TASKS_H_
 
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
-#include <stdlib.h>
-#include <stdint.h>
-
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_memmap.h"
-#include "driverlib/debug.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-
-#include <stdlib.h>
-
-#include "PID_Control.h"
-#include "orientationAndSteeringUtils.h"
+#include <PID_controller.h>
+#include "common_includes.h"
+#include "orientation_decoding.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *

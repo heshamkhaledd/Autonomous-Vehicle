@@ -8,35 +8,11 @@
 #ifndef UART_TASK_H_
 #define UART_TASK_H_
 
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
-
-#include <stdint.h>
-#include <stdbool.h>
-
-#include "driverlib/gpio.h"
-#include "driverlib/debug.h"
-#include "driverlib/fpu.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/rom.h"
-#include "driverlib/rom_map.h"
-#include "driverlib/sysctl.h"
-
+#include "common_includes.h"
 #include "driverlib/uart.h"
 #include "driverlib/usb.h"
-
-
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_gpio.h"
-#include "inc/hw_sysctl.h"
-
 #include "inc/hw_uart.h"
+#include "state_decoding.h"
 
 /**********************************************************
  *                    Dynamic Configuration

@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   orientationAndSteeringUtils.h
+ * File Name:   orientation_decoding.h
  *
  * Description: Header file for utility functions and definitions
  *              Related to orientation and steering

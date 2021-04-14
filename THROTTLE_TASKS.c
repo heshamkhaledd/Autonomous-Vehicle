@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   THROTTLE_TASKS.c
+ * File Name:   throttle_tasks.c
  *
  * Description: Throttle control source file
  *
@@ -8,7 +8,7 @@
  *
  ******************************************************************************/
 
-#include "THROTTLE_TASKS.h"
+#include "throttle_tasks.h"
 
 static StepperConfig Throttle_Args = {THROTTLE_DRIVER_PORT_CLOCK,
                                                 THROTTLE_DRIVER_PORT_BASE,

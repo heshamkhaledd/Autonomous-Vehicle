@@ -16,35 +16,11 @@
  *
  ******************************************************************************/
 
-/* FreeRTOS Includes */
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
-
-
-/* CCS Default Includes */
-#include <stdint.h>
-#include <stdbool.h>
-
+#include "common_includes.h"
 /* Tiva-Ware Macros/Defines Includes */
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_gpio.h"
-#include "inc/hw_sysctl.h"
 #include "inc/hw_uart.h"
-
 /* Tiva-Ware Drivers Includes */
-#include "driverlib/gpio.h"
-#include "driverlib/debug.h"
-#include "driverlib/fpu.h"
 #include "driverlib/interrupt.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/rom.h"
-#include "driverlib/rom_map.h"
-#include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "driverlib/usb.h"
 #include "usblib/usblib.h"
@@ -56,11 +32,13 @@
 
 /* Configurations Includes */
 #include "USB_tasks.h"
-#include "State_Decode.h"
-#include "STEERING_TASKS.h"
-#include "UART_TASK.h"
+#include "state_decoding.h"
+#include "steering_tasks.h"
+#include "UART_tasks.h"
 #include "UART.h"
-#include "THROTTLE_TASKS.h"
+#include "throttle_tasks.h"
+
+
 /* Queues handles declarations */
 QueueHandle_t Queue_Desired_Orientation;
 QueueHandle_t Queue_Current_Orientation;

@@ -1,21 +1,17 @@
  /******************************************************************************
  *
- * File Name:   PID_Control.h
+ * File Name:   PID_control.h
  *
  * Description: PID feedback control header file
  *
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#ifndef PID_CONTROL_H_
-#define PID_CONTROL_H_
+#ifndef PID_CONTROLLER_H_
+#define PID_CONTROLLER_H_
 
 
-#include <FreeRTOS.h>
-#include <task.h>
-#include <timers.h>
-#include <semphr.h>
-#include <queue.h>
+#include "common_includes.h"
 
 #include <stdint.h>
 
@@ -50,4 +46,4 @@ typedef struct{
 extern float f_PID_control (PIDcontroller* controller,float SP , float PV);
 
 
-#endif /* PID_CONTROL_H_ */
+#endif /* PID_CONTROLLER_H_ */

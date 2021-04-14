@@ -1,14 +1,14 @@
  /******************************************************************************
  *
- * File Name:   PID_TASKS.c
+ * File Name:   PID_tasks.c
  *
  * Description: PID source file to initialize and start the PID Control tasks.
  *
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#include "PID_TASKS.h"
-#include "UART_TASK.h"
+#include "PID_tasks.h"
+#include "UART_tasks.h"
 
 
 #define DEBUG

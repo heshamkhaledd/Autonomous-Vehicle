@@ -1,6 +1,6 @@
  /******************************************************************************
  *
- * File Name:   STEERING_TASKS.c
+ * File Name:   steering_tasks.c
  *
  * Description: Steering Motor source file, includes the intializing task, orientation
  *              to sterring decoding functions and the steering task.
@@ -8,7 +8,7 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#include "STEERING_TASKS.h"
+#include "steering_tasks.h"
 
 static StepperConfig Steering_Args = {STEERING_DRIVER_PORT_CLOCK,
                                                STEERING_DRIVER_PORT_BASE,

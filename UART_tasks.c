@@ -1,14 +1,14 @@
  /******************************************************************************
  *
- * File Name:   UART_TASK.c
+ * File Name:   UART_tasks.c
  *
  * Description: UART source file to initialize UART module tasks
  *
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#include "UART_TASK.h"
-#include "State_Decode.h"
+#include "UART_tasks.h"
+
 
 
 /* Declare Semaphore Handle for UART task */
