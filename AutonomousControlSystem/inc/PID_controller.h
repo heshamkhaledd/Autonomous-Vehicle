@@ -7,18 +7,17 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#ifndef PID_CONTROLLER_H_
-#define PID_CONTROLLER_H_
+#ifndef AUTONOMOUSCONTROLSYSTEM_INC_PID_CONTROLLER_H_
+#define AUTONOMOUSCONTROLSYSTEM_INC_PID_CONTROLLER_H_
 
 
-#include "common_includes.h"
-
+#include <AutonomousControlSystem/inc/common_includes.h>
 #include <stdint.h>
 
 
 
 /*******************************************************************************
- *                           Preprocessor Definies                             *
+ *                           Preprocessor Defines                             *
  *******************************************************************************/
 
 /* Configurations */
@@ -46,4 +45,4 @@ typedef struct{
 extern float f_PID_control (PIDcontroller* controller,float SP , float PV);
 
 
-#endif /* PID_CONTROLLER_H_ */
+#endif /* AUTONOMOUSCONTROLSYSTEM_INC_PID_CONTROLLER_H_ */

@@ -12,7 +12,7 @@
 #ifndef STEPPER_H_
 #define STEPPER_H_
 
-#include "common_includes.h"
+#include <AutonomousControlSystem/inc/common_includes.h>
 #include "portable.h"
 
 /****************************************************************

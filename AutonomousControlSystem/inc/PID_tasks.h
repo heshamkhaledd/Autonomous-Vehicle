@@ -1,40 +1,44 @@
  /******************************************************************************
  *
- * File Name:   state_decoding.h
+ * File Name:   PID_tasks.h
  *
- * Description: USB State decoding header file
+ * Description: PID header file to initialize and start the PID Control tasks.
  *
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#ifndef STATE_DECODE_H_
-#define STATE_DECODE_H_
 
-#include "common_includes.h"
+#ifndef AUTONOMOUSCONTROLSYSTEM_INC_PID_TASKS_H_
+#define AUTONOMOUSCONTROLSYSTEM_INC_PID_TASKS_H_
+
+#include <AutonomousControlSystem/inc/common_includes.h>
+#include <AutonomousControlSystem/inc/orientation_decoding.h>
+#include <AutonomousControlSystem/inc/PID_controller.h>
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *
  *******************************************************************************/
-#define Numbers_Ascii_Base 0x30
-#define Numbers_Ascii_Offset 9
-
-#define arr_size       15
-
-#define UART_MODULE    0
-#define USB_MODULE     1
+#define ERROR_FACTOR    0
+#define PID_STACK_DEPTH 200
+#define PID_vTASK_PRIO  1
 
 /****************************************************
  *                Global Variables                  *
  ****************************************************/
 extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Desired_Orientation;
-extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Current_Orientation;
-extern QueueHandle_t Queue_Throttle_Orientation;
+extern QueueHandle_t Queue_steering;
+
+extern float watch_steering ;
+
+extern volatile UBaseType_t PIDTaskHighWaterMark ;
 
 /*******************************************************************************
  *                          Functions Prototypes                               *
  *******************************************************************************/
-void State_Decoding (uint8_t * Data, uint8_t Module);
+extern void vInit_PID();
+void vTask_PID(void * para);
 
-#endif /* STATE_DECODE_H_ */
+
+#endif /* AUTONOMOUSCONTROLSYSTEM_INC_PID_TASKS_H_ */

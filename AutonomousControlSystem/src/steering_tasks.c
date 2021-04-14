@@ -8,7 +8,7 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#include "steering_tasks.h"
+#include <AutonomousControlSystem/inc/steering_tasks.h>
 
 static StepperConfig Steering_Args = {STEERING_DRIVER_PORT_CLOCK,
                                                STEERING_DRIVER_PORT_BASE,

@@ -8,12 +8,12 @@
  *
  ******************************************************************************/
 
-#ifndef THROTTLE_TASKS_H_
-#define THROTTLE_TASKS_H_
+#ifndef AUTONOMOUSCONTROLSYSTEM_INC_THROTTLE_TASKS_H_
+#define AUTONOMOUSCONTROLSYSTEM_INC_THROTTLE_TASKS_H_
 
-#include "common_includes.h"
+#include <AutonomousControlSystem/inc/common_includes.h>
+#include <AutonomousControlSystem/inc/stepper_motor.h>
 #include "portable.h"
-#include "stepper_motor.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *
@@ -59,4 +59,4 @@ extern QueueHandle_t Queue_Throttle_Orientation;
 extern void vInit_throttle_Tasks();
 extern void vTask_throttle(void *);
 
-#endif /* THROTTLE_TASKS_H_ */
+#endif /* AUTONOMOUSCONTROLSYSTEM_INC_THROTTLE_TASKS_H_ */

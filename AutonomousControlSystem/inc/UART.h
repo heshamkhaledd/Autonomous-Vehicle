@@ -10,9 +10,10 @@
 
 #ifndef UART_H
 #define UART_H
+
 #define TERMINATE_STRING 'o'
 
-#include "common_includes.h"
+#include <AutonomousControlSystem/inc/common_includes.h>
 #include "driverlib/fpu.h"
 #include "driverlib/uart.h"
 #include "inc/hw_uart.h"

@@ -5,20 +5,19 @@
  *      Author: Tefa
  */
 
-#ifndef USB_TASKS_H_
-#define USB_TASKS_H_
+#ifndef AUTONOMOUSCONTROLSYSTEM_INC_USB_TASKS_H_
+#define AUTONOMOUSCONTROLSYSTEM_INC_USB_TASKS_H_
 
-#include "common_includes.h"
-
+#include <AutonomousControlSystem/inc/common_includes.h>
+#include <AutonomousControlSystem/inc/state_decoding.h>
+#include <AutonomousControlSystem/inc/state_decoding.h>
+#include <AutonomousControlSystem/inc/usb_serial_structs.h>
 #include "driverlib/usb.h"
 #include "usblib/usblib.h"
 #include "usblib/usbcdc.h"
 #include "usblib/usb-ids.h"
 #include "usblib/device/usbdevice.h"
 #include "usblib/device/usbdcdc.h"
-#include "usb_serial_structs.h"
-
-#include "state_decoding.h"
 
 /*****************************************************************
  *                      Static Configuration
@@ -56,4 +55,4 @@ extern void vInit_USBTasks() ;
 
 
 
-#endif /* USB_TASKS_H_ */
+#endif /* AUTONOMOUSCONTROLSYSTEM_INC_USB_TASKS_H_ */

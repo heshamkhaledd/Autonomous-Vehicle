@@ -11,9 +11,9 @@
 #ifndef STEERING_TASKS_H
 #define STEERING_TASKS_H
 
-#include "Common_Includes.h"
-#include "orientation_decoding.h"
-#include "stepper_motor.h"
+#include <AutonomousControlSystem/inc/common_includes.h>
+#include <AutonomousControlSystem/inc/orientation_decoding.h>
+#include <AutonomousControlSystem/inc/stepper_motor.h>
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *

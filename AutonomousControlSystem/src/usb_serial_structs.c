@@ -22,16 +22,7 @@
 //
 //*****************************************************************************
 
-#include <stdint.h>
-#include <stdbool.h>
-#include "inc/hw_types.h"
-#include "driverlib/usb.h"
-#include "usblib/usblib.h"
-#include "usblib/usbcdc.h"
-#include "usblib/usb-ids.h"
-#include "usblib/device/usbdevice.h"
-#include "usblib/device/usbdcdc.h"
-#include "usb_serial_structs.h"
+#include <AutonomousControlSystem/inc/usb_serial_structs.h>
 
 //*****************************************************************************
 //

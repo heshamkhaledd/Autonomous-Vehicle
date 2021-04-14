@@ -8,7 +8,7 @@
  *
  ******************************************************************************/
 
-#include "throttle_tasks.h"
+#include <AutonomousControlSystem/inc/throttle_tasks.H>
 
 static StepperConfig Throttle_Args = {THROTTLE_DRIVER_PORT_CLOCK,
                                                 THROTTLE_DRIVER_PORT_BASE,

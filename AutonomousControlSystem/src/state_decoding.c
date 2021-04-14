@@ -7,7 +7,7 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#include "state_decoding.h"
+#include <AutonomousControlSystem/inc/state_decoding.h>
 
 uint8_t letter_index = 0;
 

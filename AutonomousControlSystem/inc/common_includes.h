@@ -1,4 +1,5 @@
 /*Standard*/
+#include <AutonomousControlSystem/inc/FreeRTOSConfig.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -26,4 +27,3 @@
 #include <timers.h>
 #include <semphr.h>
 #include <queue.h>
-#include "FreeRTOSConfig.h"

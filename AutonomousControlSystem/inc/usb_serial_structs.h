@@ -25,6 +25,13 @@
 #ifndef _USB_SERIAL_STRUCTS_H_
 #define _USB_SERIAL_STRUCTS_H_
 
+#include <AutonomousControlSystem/inc/common_includes.h>
+#include "driverlib/usb.h"
+#include "usblib/usblib.h"
+#include "usblib/usbcdc.h"
+#include "usblib/usb-ids.h"
+#include "usblib/device/usbdevice.h"
+#include "usblib/device/usbdcdc.h"
 //*****************************************************************************
 //
 // The size of the transmit and receive buffers used for the redirected UART.

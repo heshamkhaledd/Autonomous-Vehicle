@@ -8,11 +8,11 @@
 #ifndef UART_TASK_H_
 #define UART_TASK_H_
 
-#include "common_includes.h"
+#include <AutonomousControlSystem/inc/common_includes.h>
+#include <AutonomousControlSystem/inc/state_decoding.h>
 #include "driverlib/uart.h"
 #include "driverlib/usb.h"
 #include "inc/hw_uart.h"
-#include "state_decoding.h"
 
 /**********************************************************
  *                    Dynamic Configuration
