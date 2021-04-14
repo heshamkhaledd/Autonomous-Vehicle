@@ -1,8 +1,9 @@
  /******************************************************************************
  *
- * File Name:   STEPPER_TASKS.c
+ * File Name:   STEERING_TASKS.c
  *
- * Description: Stepper motor source file to initialize stepper motor tasks
+ * Description: Steering Motor source file, includes the intializing task, orientation
+ *              to sterring decoding functions and the steering task.
  *
  * Date:        10/2/2020
  *
@@ -18,8 +19,6 @@ static StepperConfig Steering_Args = {STEERING_DRIVER_PORT_CLOCK,
                                               };
 
 static StepperConfig *steeringPtr = &Steering_Args;
-
-
 
 
 /******************************************************************************
@@ -66,53 +65,20 @@ void vTask_Stepper(void *pvParameters)
     /* initial condition of the motor*/
     float desiredOrientation=0;
     int32_t movedSteps=0;
-    long  stepsDesired = 0;
+    int32_t  stepsDesired = 0;
 
     while(1)
     {
 
         /* QUEUE BLOCKING */
-        /* Blocks the task until it receives a new desired angle */
+        /* Get new input passed by queue*/
         xQueueReceive(Queue_Desired_Orientation,
                       &desiredOrientation,
                       portMAX_DELAY);
 
+        /*Decode orientation passed to queue to steering*/
         stepsDesired=f_DecodeOrientationIntoSteering(desiredOrientation);
-
-
-       movedSteps = uMove_Stepper(Queue_Desired_Orientation, movedSteps, stepsDesired, steeringPtr);
-
-//
-//           while(movedSteps != stepsDesired)
-//        {
-//            if(xQueuePeek(Queue_Desired_Orientation,&desiredOrientation,0))
-//                break;
-//
-//            if(stepsDesired>movedSteps)
-//            {
-//                movedSteps++;
-//                /* Set direction to left*/
-//                MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, ~(steeringPtr->Direction_Pin));
-//            }
-//            else
-//            {
-//                movedSteps--;
-//                /* Set direction to right*/
-//                MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Direction_Pin, steeringPtr->Direction_Pin);
-//            }
-//
-//            /* making a high pulse on pulse pin to make a step.
-//            * making pulse start by making a rising edge. */
-//            MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Pulse_Pin, steeringPtr->Pulse_Pin);
-//
-//            /* delay to recognise the high pulse. */
-//            vTaskDelay(steeringPtr->Driver_Delay);
-//
-//            /* end of pulse by making a falling edge */
-//            MAP_GPIOPinWrite(steeringPtr->Port_Base, steeringPtr->Pulse_Pin, ~(steeringPtr->Pulse_Pin));
-//
-//            /* delay before another pulse. */
-//            vTaskDelay(steeringPtr->Driver_Delay);
-//        }*/
+        /*Move motor by desired steps*/
+        movedSteps = int32_Move_Stepper(Queue_Desired_Orientation, movedSteps, stepsDesired, steeringPtr);
     }
 }

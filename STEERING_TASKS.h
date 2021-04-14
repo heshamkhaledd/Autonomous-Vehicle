@@ -1,18 +1,16 @@
  /******************************************************************************
  *
- * File Name:   STEPPER_TASKS.h
+ * File Name:   STEERING_TASKS.h
  *
- * Description: Stepper motor header file to initialize stepper motor tasks
+ * Description: Steering Motor header file, includes the intializing task and
+ *              the steering task.
  *
  * Date:        10/2/2020
  *
  ******************************************************************************/
+#ifndef STEERING_TASKS_H
+#define STEERING_TASKS_H
 
-
-
-
-#ifndef STEPPER_TASKS_H_
-#define STEPPER_TASKS_H_
 
 #include "inc/hw_ints.h"
 #include <stdint.h>
@@ -29,17 +27,17 @@
 #include <timers.h>
 #include <semphr.h>
 #include <queue.h>
-#include "orientationAndSteeringUtils.h"
+
 #include "STEPPER.h"
 
 /*******************************************************************************
  *                           Preprocessor Definies                             *
  *******************************************************************************/
-
-/* Static Configurations */
+/* Steering motor task/HW Configurations */
 #define STEPPER_vTASK_STACK_DEPTH 80
+#define STEERING_vTASK_PRIO 2
 
-/* Steering Driver Port&Pins configurations */
+/* Steering Driver Port & Pins configurations */
  #define STEERING_DRIVER_PORT_CLOCK SYSCTL_PERIPH_GPIOF
  #define STEERING_DRIVER_PORT_BASE GPIO_PORTF_BASE
  #define STEERING_PULSE_PIN GPIO_PIN_1
@@ -47,19 +45,16 @@
  #define STEERING_ENABLE_PIN GPIO_PIN_3
  #define STEERING_STEP_DELAY 5
 
- #define STEERING_vTASK_PRIO 2
-
-/* Steering Driver Port&Pins configurations */
+/* Brakes Driver Port & Pins configurations */
  #define BRAKES_DRIVER_PORT_CLOCK SYSCTL_PERIPH_GPIOB
  #define BRAKES_DRIVER_PORT_BASE GPIO_PORTB_BASE
  #define BRAKES_PULSE_PIN GPIO_PIN_2
  #define BRAKES_DIRECTION_PIN GPIO_PIN_3
  #define BRAKES_ENABLE_PIN GPIO_PIN_4
- #define BRAKES_STEP_DELAY 10
 
+ #define BRAKES_STEP_DELAY 10
  #define BRAKES_vTASK_PRIO 1
 
- 
 
 /*****************************************************************
  *                          Variables                            *
@@ -75,8 +70,6 @@ extern QueueHandle_t Queue_Current_Orientation;
 *******************************************************************************/
 extern void vInit_Steppers_Tasks();
 void vTask_Stepper(void *pvParameters);
-
-
  
- #endif /* STEPPER_TASKS_H_ */
+ #endif /* STEERING_TASKS_H */
  

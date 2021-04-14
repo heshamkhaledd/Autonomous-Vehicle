@@ -42,7 +42,7 @@ void vTask_throttle(void *pvParameters)
     float desired_angle;
     /*stores the number of pulses generated on the stepper*/
     int32_t movedSteps = 0;
-    long stepsDesired;
+    int32_t stepsDesired;
 
     while (1)
     {
@@ -65,7 +65,7 @@ void vTask_throttle(void *pvParameters)
         /*convert desried angle into steps or pulses*/
         stepsDesired = ((STEP) * (desired_angle));
 
-         movedSteps = uMove_Stepper(Queue_angles_desired, movedSteps, stepsDesired, throttlePtr);
+         movedSteps = int32_Move_Stepper(Queue_angles_desired, movedSteps, stepsDesired, throttlePtr);
     }
 }
 /******************************************************************************

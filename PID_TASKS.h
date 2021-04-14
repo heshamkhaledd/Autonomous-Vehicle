@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "PID_Control.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
@@ -29,6 +28,7 @@
 
 #include <stdlib.h>
 
+#include "PID_Control.h"
 #include "orientationAndSteeringUtils.h"
 
 /*******************************************************************************
