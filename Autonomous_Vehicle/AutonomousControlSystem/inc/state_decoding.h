@@ -18,7 +18,7 @@
 #define Numbers_Ascii_Base 0x30
 #define Numbers_Ascii_Offset 9
 
-#define arr_size       15
+#define PACKET_SIZE       5
 
 #define UART_MODULE    0
 #define USB_MODULE     1

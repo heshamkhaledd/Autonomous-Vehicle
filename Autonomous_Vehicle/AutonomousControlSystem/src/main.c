@@ -43,6 +43,7 @@
 QueueHandle_t Queue_Desired_Orientation;
 QueueHandle_t Queue_Current_Orientation;
 QueueHandle_t Queue_Throttle_Orientation;
+QueueHandle_t Queue_Feedback;
 
 
 int main(void)
@@ -53,20 +54,22 @@ int main(void)
     MAP_FPULazyStackingEnable();
     MAP_FPUEnable();
 
-    MAP_SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN); /* Set the clocking to run at 50 MHz from the PLL. */
+    MAP_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN); /* Set the clocking to run at 80 MHz from the PLL. */
+
     MAP_IntMasterEnable();                                                                      /* Enable Global Interrupt-bit */
 
     /* Creating the Queues and storing their addresses in their handles */
     Queue_Current_Orientation = xQueueCreate(1,4);
     Queue_Desired_Orientation = xQueueCreate(1,4);
     Queue_Throttle_Orientation = xQueueCreate(1,4);
+    Queue_Feedback = xQueueCreate(1,5);
 
     /* Initializing System's modules */
     vInit_Steppers_Tasks();
     vInit_throttle_Tasks();
     vInit_USBTasks();
-    //UART1_Init(9600);
-    //vInit_UART();
+    UART1_Init(115200);
+    vInit_UART();
 
         /* Prototype for xTaskCreate:
         *

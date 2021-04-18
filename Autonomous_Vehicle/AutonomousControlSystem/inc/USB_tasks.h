@@ -46,6 +46,10 @@ extern volatile UBaseType_t USBRecieveHighWaterMark ;
 extern SemaphoreHandle_t Sem_USBReceive ;
 
 /*****************************************************************
+ *                       Queues
+ *****************************************************************/
+extern QueueHandle_t Queue_Feedback;
+/*****************************************************************
  *                    TASKS Declaration
  *****************************************************************/
 

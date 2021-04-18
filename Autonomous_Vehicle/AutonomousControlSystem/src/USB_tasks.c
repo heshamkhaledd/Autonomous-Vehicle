@@ -8,12 +8,13 @@
  *
  ******************************************************************************/
 #include <AutonomousControlSystem/inc/USB_tasks.h>
-#define TESTING_ON_LAPTOP  /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
-#define PACKET_SIZE 7      /*If we connect the board to Xavier we need to define the received packet size, 
+//#define TESTING_ON_LAPTOP  /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
+#define PACKET_SIZE 16      /*If we connect the board to Xavier we need to define the received packet size,
                                 initially it is 10 bytes (XXXoXXT) X stands for ascii numbers or minus sign. 
                                 Note: We can change it from here.*/
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
+SemaphoreHandle_t Sem_USBTransmit;
 bool g_bUSBConfigured = false;
 /******************************************************************************
  *
@@ -124,9 +125,20 @@ uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
  *****************************************************************/
 uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
+    uint8_t bytegotfromusb;
     if(ui32Event == USB_EVENT_RX_AVAILABLE) /*Checking the receive event to give the semaphore*/
     {
-        xSemaphoreGiveFromISR(Sem_USBReceive,NULL);
+        USBBufferRead((tUSBBuffer*) &g_sRxBuffer, &bytegotfromusb, 1);
+        if (bytegotfromusb == 'x')
+        {
+            xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
+            /*Give Transmit semaphore here to send feedback*/
+        }
+        else
+        {
+            xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
+            /*we have a new packet incoming*/
+        }
     }
     return(0);
 }
@@ -174,15 +186,22 @@ void vTASK_USBReceive (void *pvParameters)
 #ifndef TESTING_ON_LAPTOP 
 void vTASK_USBReceive (void *pvParameters)
 {
-    uint8_t dataFromHost[PACKET_SIZE+1];
+    uint8_t dataFromHost1[8];
+    uint8_t dataFromHost2[8];
+    uint8_t dataFromHost3[3];
     while(1)
     {
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
-        USBBufferRead(&g_sRxBuffer,dataFromHost,PACKET_SIZE);
+        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
+        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost2,7);
+        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost3,2);
         //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
-        dataFromHost[PACKET_SIZE]='\0';
-         State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
-        /*Important question:
+        dataFromHost1[7]='\0';
+        dataFromHost2[7]='\0';
+        dataFromHost3[2]='\0';
+        State_Decoding (dataFromHost1, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
+        State_Decoding (dataFromHost2, USB_MODULE);
+        State_Decoding (dataFromHost3, USB_MODULE);/*Important question:
         * 1- will the received data be as a one packet that has the data for throttle and steering together?
         *   -> if yes, we need to edit state_Decoding function to handle something like this ['-','5','t','-','2','4','O','\0']
         *   -> if No, we won't change state decoding function 
@@ -206,10 +225,12 @@ void vTASK_USBTransmit (void * params)
 {
     /*We need a queue here to communicate with the received data from UART "in a string format" 
     to send it back to the processor*/
+    uint8_t FeedbackDataToTransmit[5];
     while(1)
     {
-        
-        vTaskSuspend (NULL);
+        xQueueReceive(Queue_Feedback, (void *)FeedbackDataToTransmit, portMAX_DELAY);
+        xSemaphoreTake(Sem_USBTransmit,portMAX_DELAY);
+        USBBufferWrite((tUSBBuffer *)&g_sTxBuffer,FeedbackDataToTransmit,5);
 
     }
 }
@@ -231,6 +252,7 @@ void vInit_USBTasks()
 
     /* Creating Semaphores */
     Sem_USBReceive = xSemaphoreCreateBinary();
+    Sem_USBTransmit= xSemaphoreCreateBinary();
 
     /* Creating Tasks */
     xTaskCreate(vTASK_USBReceive,                       /* Task Address       */

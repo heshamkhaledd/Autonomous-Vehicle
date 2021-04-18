@@ -13,7 +13,7 @@
 
 /* Declare Semaphore Handle for UART task */
 SemaphoreHandle_t Sem_UARTReceive;
-
+extern QueueHandle_t Queue_Feedback; /*New queue to pass the feedback value to usb to transmit*/
 /******************************************************************************
  *
  * Function Name: vInit_UART
@@ -52,7 +52,7 @@ void vInit_UART(void)
 void vTask_UART(void *pvParameters)
 {
 
-    uint8_t UART_Received_Frame[arr_size];
+    uint8_t UART_Received_Frame[PACKET_SIZE]; // only receiving rotation feedback values
 
     static uint8_t index = 0;
 
@@ -61,21 +61,13 @@ void vTask_UART(void *pvParameters)
         xSemaphoreTake(Sem_UARTReceive,portMAX_DELAY);
 
         /* Check if there received char in the buffer or not */
-        while (UARTCharsAvail(UART0_BASE))
+        for(index=0;index<=3;index++)
         {
-            UART_Received_Frame[index] = UARTCharGet(UART0_BASE); /* Get the received char */
-
-            /* If the received character is a letter. The frame is completed, we must start decoding it */
-            if (UART_Received_Frame[index] == 'r' || UART_Received_Frame[index] == 'R')
-            {
-                UART_Received_Frame[++index] = '\0';
-                break;
-            }
-
-            index++;
+            UART_Received_Frame[index] = UARTCharGetNonBlocking(UART1_BASE); /* Get the received char */
         }
+        UART_Received_Frame[PACKET_SIZE-1]='R';
+        xQueueOverwrite(Queue_Feedback,(void *)UART_Received_Frame); //Queue Feedback passes the feedback data to transmit task in usb
+        //State_Decoding (UART_Received_Frame, UART_MODULE);
 
-        State_Decoding (UART_Received_Frame, UART_MODULE);
-        index = 0;
     }
 }
