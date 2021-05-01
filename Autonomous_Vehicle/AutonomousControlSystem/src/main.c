@@ -68,8 +68,8 @@ int main(void)
     vInit_Steppers_Tasks();
     vInit_throttle_Tasks();
     vInit_USBTasks();
-    UART1_Init(115200);
-    vInit_UART();
+    //UART1_Init(115200);
+   // vInit_UART();
 
         /* Prototype for xTaskCreate:
         *

@@ -9,12 +9,15 @@
  ******************************************************************************/
 #include <AutonomousControlSystem/inc/USB_tasks.h>
 //#define TESTING_ON_LAPTOP  /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
-#define PACKET_SIZE 16      /*If we connect the board to Xavier we need to define the received packet size,
+/*#define PACKET_SIZE 16*/      /*If we connect the board to Xavier we need to define the received packet size,
                                 initially it is 10 bytes (XXXoXXT) X stands for ascii numbers or minus sign. 
                                 Note: We can change it from here.*/
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
 SemaphoreHandle_t Sem_USBTransmit;
+uint8_t dataFromHost1[8];
+uint8_t dataFromHost2[8];
+uint8_t dataFromHost3[3];
 bool g_bUSBConfigured = false;
 /******************************************************************************
  *
@@ -126,6 +129,7 @@ uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
 uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
     uint8_t bytegotfromusb;
+
     if(ui32Event == USB_EVENT_RX_AVAILABLE) /*Checking the receive event to give the semaphore*/
     {
         USBBufferRead((tUSBBuffer*) &g_sRxBuffer, &bytegotfromusb, 1);
@@ -134,9 +138,16 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
             xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
             /*Give Transmit semaphore here to send feedback*/
         }
-        else
+        else if(bytegotfromusb == 'F')
         {
             xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
+            USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost1, 7);
+            USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost2, 7);
+            USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost3, 2);
+            //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
+            dataFromHost1[7] = '\0';
+            dataFromHost2[7] = '\0';
+            dataFromHost3[2] = '\0';
             /*we have a new packet incoming*/
         }
     }
@@ -186,19 +197,17 @@ void vTASK_USBReceive (void *pvParameters)
 #ifndef TESTING_ON_LAPTOP 
 void vTASK_USBReceive (void *pvParameters)
 {
-    uint8_t dataFromHost1[8];
-    uint8_t dataFromHost2[8];
-    uint8_t dataFromHost3[3];
+
     while(1)
     {
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
-        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
+        /*USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
         USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost2,7);
         USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost3,2);
         //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
-        dataFromHost1[7]='\0';
+        /*dataFromHost1[7]='\0';
         dataFromHost2[7]='\0';
-        dataFromHost3[2]='\0';
+        dataFromHost3[2]='\0';*/
         State_Decoding (dataFromHost1, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
         State_Decoding (dataFromHost2, USB_MODULE);
         State_Decoding (dataFromHost3, USB_MODULE);/*Important question:
@@ -207,6 +216,7 @@ void vTASK_USBReceive (void *pvParameters)
         *   -> if No, we won't change state decoding function 
         *       but we must agree on a fixed packet size for the steering and throttling packet.
         * */
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 #endif
