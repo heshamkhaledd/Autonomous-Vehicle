@@ -1,2 +1,2 @@
 # Autonomous-Car
-Cairo University Eco Racing Team Autonomous Car system. Made for Shell Eco-Marathon 2021. Embedded Control Subteam.
+Cairo University Eco Racing Team Autonomous Car Control System. Made for Shell Eco-Marathon 2021 Competition. Embedded Autonomous Control Subteam.
