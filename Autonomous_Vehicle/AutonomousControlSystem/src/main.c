@@ -37,15 +37,11 @@
 #include "utils/ustdlib.h"
 
 /* Configurations Includes */
-<<<<<<< HEAD:main.c
-#include "USB_tasks.h"
-#include "PID_TASKS.h"
-#include "State_Decode.h"
-#include "STEPPER_TASKS.h"
-#include "UART_TASK.h"
-=======
 
->>>>>>> development:Autonomous_Vehicle/AutonomousControlSystem/src/main.c
+
+
+
+
 
 /* Queues handles declarations */
 QueueHandle_t Queue_Desired_Orientation;
