@@ -1,4 +1,4 @@
- /******************************************************************************
+/******************************************************************************
  *
  * File Name:   USB_tasks.c
  *
@@ -15,10 +15,43 @@
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
 SemaphoreHandle_t Sem_USBTransmit;
+
+volatile uint8_t g_ucCounter=0;
+
 uint8_t dataFromHost1[8];
 uint8_t dataFromHost2[8];
 uint8_t dataFromHost3[3];
 bool g_bUSBConfigured = false;
+
+#define TESTING_ON_LAPTOP
+
+/******************************************************************************
+ *
+ * Function Name: USB_receiveString
+ *
+ * Description: Responsible of receiving frame of testing on laptop for rotating
+ *              and throttling in the string Str.
+ *
+ * Arguments:   uint8_t *Str
+ * Return:      void
+ *
+ *****************************************************************************/
+void USB_receiveString(uint8_t *Str)
+{
+    //uint8_t i = 0;
+    USBBufferRead((tUSBBuffer *)&g_sRxBuffer, Str , 5);  /*Reading the value sent from PC*/
+
+    if (*(Str+4)==13)
+    {
+        *(Str+4) = '\0';
+    }
+    else
+    {
+        USBBufferFlush((tUSBBuffer *)&g_sRxBuffer);
+        g_ucCounter=0;
+    }
+}
+
 /******************************************************************************
  *
  * Function Name: USB_GetLineCoding
@@ -81,35 +114,35 @@ uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue
 {
     tLineCoding *pvdata = pvMsgData;
     switch(ui32Event)
-       {
+    {
 
-           case USB_EVENT_CONNECTED:
+    case USB_EVENT_CONNECTED:
 
-               g_bUSBConfigured = true;
-               /*flushing the buffers*/
-               USBBufferFlush(&g_sTxBuffer);
-               USBBufferFlush(&g_sRxBuffer);
+        g_bUSBConfigured = true;
+        /*flushing the buffers*/
+        USBBufferFlush(&g_sTxBuffer);
+        USBBufferFlush(&g_sRxBuffer);
 
-               break;
-
-
-           case USB_EVENT_DISCONNECTED:
-               g_bUSBConfigured = false;
-
-               break;
+        break;
 
 
-           case USBD_CDC_EVENT_GET_LINE_CODING:
-           case USBD_CDC_EVENT_SET_LINE_CODING:
-               /*setting the USB serial configurations*/
+    case USB_EVENT_DISCONNECTED:
+        g_bUSBConfigured = false;
 
-               USB_GetLineCoding(pvdata);
-               break;
+        break;
 
 
-           default:
-               break;
-       }
+    case USBD_CDC_EVENT_GET_LINE_CODING:
+    case USBD_CDC_EVENT_SET_LINE_CODING:
+        /*setting the USB serial configurations*/
+
+        USB_GetLineCoding(pvdata);
+        break;
+
+
+    default:
+        break;
+    }
     return 0;
 }
 
@@ -120,7 +153,7 @@ uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
 {
     /*We don't need to do anything here as this handler will be called after we send the data in the Transmit task*/
     return(0);  
-    
+
 }
 
 /*****************************************************************
@@ -128,29 +161,43 @@ uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
  *****************************************************************/
 uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
+#ifndef TESTING_ON_LAPTOP
     uint8_t bytegotfromusb;
+    USBBufferRead((tUSBBuffer*) &g_sRxBuffer, &bytegotfromusb, 1);
+    if (bytegotfromusb == 'x')
+    {
+        xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
+        /*Give Transmit semaphore here to send feedback*/
+    }
+    else if(bytegotfromusb == 'F')
+    {
+        USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost1, 7);
+        USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost2, 7);
+        USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost3, 2);
+        //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
+        dataFromHost1[7] = '\0';
+        dataFromHost2[7] = '\0';
+        dataFromHost3[2] = '\0';
+        /*we have a new packet incoming*/
+    }
+#endif
+#ifdef TESTING_ON_LAPTOP
 
     if(ui32Event == USB_EVENT_RX_AVAILABLE) /*Checking the receive event to give the semaphore*/
     {
-        USBBufferRead((tUSBBuffer*) &g_sRxBuffer, &bytegotfromusb, 1);
-        if (bytegotfromusb == 'x')
+        if (g_ucCounter==5)
         {
-            xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
-            /*Give Transmit semaphore here to send feedback*/
-        }
-        else if(bytegotfromusb == 'F')
-        {
+            g_ucCounter=0;
             xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
-            USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost1, 7);
-            USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost2, 7);
-            USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost3, 2);
-            //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
-            dataFromHost1[7] = '\0';
-            dataFromHost2[7] = '\0';
-            dataFromHost3[2] = '\0';
-            /*we have a new packet incoming*/
+        }
+        else
+        {
+            g_ucCounter++;
         }
     }
+
+#endif
+
     return(0);
 }
 
@@ -169,27 +216,51 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
 #ifdef TESTING_ON_LAPTOP
 void vTASK_USBReceive (void *pvParameters)
 {
-    uint8_t dataFromHost[arr_size],i=0;
+    uint8_t dataFromHost[arr_size];
     while(1)
     {
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
-        USBBufferRead(&g_sRxBuffer,&dataFromHost[i],1);
-        USBBufferWrite(&g_sTxBuffer,&dataFromHost[i],1); /*Line to echo the data to putty's terminal*/
-        if(dataFromHost[i] == 'O' || dataFromHost[i] == 'o' || dataFromHost[i] == 't' || dataFromHost[i] == 'T')
+
+        USB_receiveString(dataFromHost);
+
+        //USBBufferRead(&g_sRxBuffer,&dataFromHost[i],1);
+        //USBBufferWrite(&g_sTxBuffer,&dataFromHost[i],1); /*Line to echo the data to putty's terminal*/
+
+        if (dataFromHost[arr_size-1]=='\0')
         {
-            dataFromHost[i+1] = '\0'; 
-            State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
-            i=0;
-        }
-        else if (dataFromHost[i] == 'e' || dataFromHost[i]=='E')
-        {
-            i = 0;
+            switch (dataFromHost[arr_size-2])
+            {
+            case 'R':
+            case 'r':
+            case 'T':
+            case 't':
+                State_Decoding (dataFromHost, USB_MODULE);
+                break;
+            default:
+                /*Invalid frame*/
+                break;
+            }
         }
         else
         {
-            i++;
+            /*Invalid frame*/
         }
-        
+        //        uint8_t i=0;
+        //        if(dataFromHost[i] == 'O' || dataFromHost[i] == 'o' || dataFromHost[i] == 't' || dataFromHost[i] == 'T')
+        //        {
+        //            dataFromHost[i+1] = '\0';
+        //            State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
+        //            i=0;
+        //        }
+        //        else if (dataFromHost[i] == 'e' || dataFromHost[i]=='E')
+        //        {
+        //            i = 0;
+        //        }
+        //        else
+        //        {
+        //            i++;
+        //        }
+
     }
 }
 #endif
@@ -211,11 +282,11 @@ void vTASK_USBReceive (void *pvParameters)
         State_Decoding (dataFromHost1, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
         State_Decoding (dataFromHost2, USB_MODULE);
         State_Decoding (dataFromHost3, USB_MODULE);/*Important question:
-        * 1- will the received data be as a one packet that has the data for throttle and steering together?
-        *   -> if yes, we need to edit state_Decoding function to handle something like this ['-','5','t','-','2','4','O','\0']
-        *   -> if No, we won't change state decoding function 
-        *       but we must agree on a fixed packet size for the steering and throttling packet.
-        * */
+         * 1- will the received data be as a one packet that has the data for throttle and steering together?
+         *   -> if yes, we need to edit state_Decoding function to handle something like this ['-','5','t','-','2','4','O','\0']
+         *   -> if No, we won't change state decoding function
+         *       but we must agree on a fixed packet size for the steering and throttling packet.
+         * */
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }

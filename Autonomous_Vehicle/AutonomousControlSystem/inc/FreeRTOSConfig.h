@@ -22,7 +22,7 @@
 #define configUSE_PREEMPTION                    1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
 #define configUSE_TICKLESS_IDLE                 0
-#define configCPU_CLOCK_HZ 						80000000UL // 50MHz clock
+#define configCPU_CLOCK_HZ 						80000000UL // 80MHz clock
 #define configTICK_RATE_HZ                      1000 // 1ms SysTick ticker
 #define configMAX_PRIORITIES                    8 // Adjustable but I kept it at 8 for kicks.
 #define configMINIMAL_STACK_SIZE                128 // Idle task stack (in 32-bit words)
