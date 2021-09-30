@@ -16,7 +16,7 @@
 SemaphoreHandle_t Sem_USBReceive;
 SemaphoreHandle_t Sem_USBTransmit;
 
-volatile uint8_t g_ucCounter=0;
+
 
 uint8_t dataFromHost1[8];
 uint8_t dataFromHost2[8];
@@ -38,17 +38,16 @@ bool g_bUSBConfigured = false;
  *****************************************************************************/
 void USB_receiveString(uint8_t *Str)
 {
-    //uint8_t i = 0;
-    USBBufferRead((tUSBBuffer *)&g_sRxBuffer, Str , 5);  /*Reading the value sent from PC*/
 
-    if (*(Str+4)==13)
+    USBBufferRead((tUSBBuffer *)&g_sRxBuffer, Str,5 );  /*Reading the value sent from PC*/
+
+    if (*(Str+4)== 13 )
     {
         *(Str+4) = '\0';
     }
     else
     {
         USBBufferFlush((tUSBBuffer *)&g_sRxBuffer);
-        g_ucCounter=0;
     }
 }
 
@@ -185,14 +184,9 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
 
     if(ui32Event == USB_EVENT_RX_AVAILABLE) /*Checking the receive event to give the semaphore*/
     {
-        if (g_ucCounter==5)
+        if(ui32MsgValue == 5)
         {
-            g_ucCounter=0;
             xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
-        }
-        else
-        {
-            g_ucCounter++;
         }
     }
 
@@ -275,7 +269,7 @@ void vTASK_USBReceive (void *pvParameters)
         /*USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
         USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost2,7);
         USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost3,2);
-        //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
+        USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
         /*dataFromHost1[7]='\0';
         dataFromHost2[7]='\0';
         dataFromHost3[2]='\0';*/
