@@ -8,6 +8,7 @@
  *
  ******************************************************************************/
 #include <AutonomousControlSystem/inc/USB_tasks.h>
+#include <stdint.h>
 //#define TESTING_ON_LAPTOP  /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
 /*#define PACKET_SIZE 16*/      /*If we connect the board to Xavier we need to define the received packet size,
                                 initially it is 10 bytes (XXXoXXT) X stands for ascii numbers or minus sign. 
@@ -70,7 +71,7 @@ void USB_GetLineCoding(tLineCoding *psLineCoding)
     /*8-bit data*/
     psLineCoding->ui8Databits = 8;
     /*no parity bits*/
-    psLineCoding->ui8Parity =USB_CDC_PARITY_NONE;
+    psLineCoding->ui8Parity =USB_CDC_PARITY_NONE;'='//xd
 }
 
 /******************************************************************************
@@ -298,6 +299,7 @@ void vTASK_USBReceive (void *pvParameters)
  *****************************************************************************/
 void vTASK_USBTransmit (void * params)
 {
+    vTaskSuspend();
     /*We need a queue here to communicate with the received data from UART "in a string format" 
     to send it back to the processor*/
     uint8_t FeedbackDataToTransmit[5];
