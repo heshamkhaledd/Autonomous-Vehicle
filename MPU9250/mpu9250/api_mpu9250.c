@@ -14,6 +14,7 @@
 
 //  Local (to this file) variables for holding configuration data
 //  Values are defined as enums in "registerMap.h"
+
 uint8_t Gscale = GFS_250DPS;
 uint8_t Ascale = AFS_2G;
 uint8_t Mscale = MFS_16BITS;

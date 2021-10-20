@@ -140,6 +140,16 @@ class MPU9250
 #endif
 };
 */
+
+//------------------------------------------- START MPU9250 --------------------------------------------//
+
+
+
+
+//------------------------------------------- END MPU9250 --------------------------------------------//
+
+
+//-------------------------------------------CODE EDITS--------------------------------------------//
 struct MPU9250{
 #if defined(__HAL_USE_MPU9250_NODMP__)
     private:
@@ -176,7 +186,7 @@ typedef struct MPU9250 MPU9250;
  void MPUDataHandler(void);
 
 
-static MPU9250* GetP();
+MPU9250* GetP();
 
 int8_t  InitHW();
 int8_t  InitSW();
@@ -187,11 +197,11 @@ uint8_t GetID();
 
 int8_t  ReadSensorData(MPU9250*M);
 int8_t  RPY(float* RPY, bool inDeg,MPU9250*M);
-int8_t  Acceleration(float *acc);
+int8_t  Acceleration(float *acc,MPU9250*M);
 int8_t  Gyroscope(float *gyro);
 int8_t  Magnetometer(float *mag);
 
-void MPU9250_value_init();
+void MPU9250_value_init(MPU9250 *M);
 
 //void operator=(MPU9250 const &arg) {} //  No definition - forbid this
 

@@ -21,6 +21,9 @@
 
 #include "UARTs.h"
 
+
+
+
 void UART0_Config()
 {
     /*Initialize the Clock System */
@@ -64,17 +67,34 @@ void UART0_SendString(const char * str)
      while(str[i] != 0)
         UART0_SendChr(str[i++]);
 }
-/*it does not send the integer as it is
- * it convertes the integer to equivlalent chars
- * send each data
- * this is not usefuk for serial communication
- * used for debugging purpose to print on screen
- */
-void UART0_SendInt(uint8_t i)
+
+/* Function Name: UART_sendNumber
+*  Fucntion description: Sends a number by converting its digits into a string
+*
+*/
+void UART_sendNumber(uint32_t out)
 {
-    UARTCharPut(UART0_BASE,i+48);
-    UARTCharPut(UART0_BASE,'\r');
-    UARTCharPut(UART0_BASE,'\n');
+
+        uint16_t c[10] = {0} ;
+        uint16_t m;
+        int_least32_t i = 0 ;
+
+        if(out == 0)
+        {
+            c[0] = 48;
+            i = 0 ;
+        }
+        while(out)
+        {
+            m = out%10;
+            c[i++] = m + 48;
+            out = out/10;
+        }
+        while(i != -1)
+        {
+            UART0_SendChr(c[i--]);
+        }
+
 }
 
 
