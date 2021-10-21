@@ -34,11 +34,19 @@ void UNUSED (int32_t arg) { }
  * Initialize microcontroller board clock & enable on-board floating-point unit
  */
 void HAL_BOARD_CLOCK_Init()
-{
+{/*
+
+
     // Set the clock to use on-board 25MHz oscillator and generate 120MHz clock
     g_ui32SysClock = MAP_SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ |
                                         SYSCTL_OSC_MAIN | SYSCTL_USE_PLL |
                                         SYSCTL_CFG_VCO_480), 120000000);
+
+
+   */
+
+    MAP_SysCtlClockSet(SYSCTL_USE_PLL|SYSCTL_SYSDIV_2_5|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
+
     //  Enable Floating-point unit (FPU)
     MAP_FPUEnable();
     //FPULazyStackingEnable();
@@ -61,11 +69,14 @@ void HAL_BOARD_Reset()
  */
 void HAL_DelayUS(uint32_t us)   //1000
 {
-    float f = 1000000 / (float)us;//  Frequency = 1 / Period
+  /*  float f = 1000000 / (float)us;//  Frequency = 1 / Period
 
     f = (float)g_ui32SysClock / (3.0 * f);
     MAP_SysCtlDelay((uint32_t)f);
-}
+*/
+    SysCtlDelay(us * (SysCtlClockGet() / 3 / 1000000));
+
+    }
 
 /**
  * Calculate load value from timer based on desired time in milliseconds
@@ -74,7 +85,7 @@ void HAL_DelayUS(uint32_t us)   //1000
  */
 uint32_t _TM4CMsToCycles(uint32_t ms)
 {
-    return (ms*(g_ui32SysClock/1000));
+    return (ms*(SysCtlClockGet()/1000));
 }
 
 /**

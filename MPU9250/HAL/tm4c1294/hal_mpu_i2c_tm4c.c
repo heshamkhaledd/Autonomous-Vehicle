@@ -141,10 +141,8 @@ void HAL_MPU_Init(void((*custHook)(void)))
 void HAL_MPU_PowerSwitch(bool powerState)
 {
     if (powerState)
-       // MAP_GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_1, 0xFF);
         MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0xFF);
     else
-       // MAP_GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_1, 0x00);
         MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x00);
 }
 
@@ -204,6 +202,7 @@ uint8_t HAL_MPU_WriteBytes(uint8_t I2Caddress, uint8_t regAddress,
     //  mode as we're sending more than 1 byte
     MAP_I2CMasterControl(MPU9250_I2C_BASE, I2C_MASTER_CMD_BURST_SEND_START);
     HAL_DelayUS(4);
+
     while(MAP_I2CMasterBusy(MPU9250_I2C_BASE));
 
     //  Loop through all data that needs to be sent. Send everything but last

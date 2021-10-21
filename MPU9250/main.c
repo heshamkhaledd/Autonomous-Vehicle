@@ -28,7 +28,6 @@
 
 #ifdef __DEBUG_SESSION__
 #include "serialPort/UARTs.h"
-//#include "serialPort/uartHW.h"
 #endif
 
 
@@ -181,8 +180,10 @@ int8_t InitSW()
 
     // Initialize HAL state variables.
     memset(&hal, 0, sizeof(hal));
+
+
 #ifdef __DEBUG_SESSION__
-    DEBUG_WRITE("Trying to load firmware\n");
+    UART0_SendString("Trying to load firmware\n");
 #endif
     result = 7; //  Try loading firmware max 7 times
     while(result--)
@@ -191,7 +192,7 @@ int8_t InitSW()
 #ifdef __DEBUG_SESSION__
         else
         {
-            DEBUG_WRITE("result when  Try loading firmware");
+            UART0_SendString("result when  Try loading firmware\n");
             UART_sendNumber((uint32_t)result);
         }
 #endif
@@ -199,16 +200,22 @@ int8_t InitSW()
     if (result <= 0)    //  If loading failed 7 times hang here, DMP not usable
     {
 #ifdef __DEBUG_SESSION__
-        DEBUG_WRITE("   >failed\n");
+
+        UART0_SendString("failed  \n");
 #endif
-        //  Hang here if unable to load the firmware
+
         while(1);
     }
 
 #ifdef __DEBUG_SESSION__
-    DEBUG_WRITE(" >Firmware loaded\n");
-    DEBUG_WRITE(" >Updating DMP features...");
+
+
+    UART0_SendString(" >Firmware loaded\n ");
+
+    UART0_SendString(" >Updating DMP features...\n");
+
 #endif
+
     dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation));
 
     hal.dmp_features = DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_TAP |
@@ -220,7 +227,9 @@ int8_t InitSW()
     mpu_set_dmp_state(1);
     hal.dmp_on = 1;
 #ifdef __DEBUG_SESSION__
-    DEBUG_WRITE("done\n");
+    //DEBUG_WRITE("done\n");
+
+    UART0_SendString("done.\n");
 #endif
 
     return MPU_SUCCESS;
@@ -443,6 +452,7 @@ int8_t Magnetometer(float *mag)
 
 
 int main(void)
+
 {
     //MPU9250& mpu = MPU9250::GetI();
 
@@ -465,10 +475,14 @@ int main(void)
     //  Initialize hardware used by MPU9250
     InitHW();
 
+    UART0_SendString("ALOOOOO.. \n");
     //  Software initialization of MPU9250
     //  Either configure registers for direct sensor readings or load DMP
     //  firmware
-    InitSW();
+
+   InitSW();
+
+    UART0_SendString("SALAM. \n");
 
 #ifdef __HAL_USE_MPU9250_NODMP__
     //  Set AHRS time step to 1kHz and configure gains
@@ -480,6 +494,10 @@ int main(void)
     uint32_t counter = 0;
     while (1)
     {
+
+
+        UART0_SendString("Initialized Uart .     .. \n");
+
         //  Check if MPU toggled interrupt pin
         //  (this example doesn't use actual interrupts, but polling)
         if (HAL_MPU_DataAvail())
