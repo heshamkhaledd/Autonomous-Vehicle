@@ -1,4 +1,4 @@
- /******************************************************************************
+/******************************************************************************
  *
  * File Name:   steering_tasks.c
  *
@@ -11,12 +11,12 @@
 #include <AutonomousControlSystem/inc/steering_tasks.h>
 
 static StepperConfig Steering_Args = {STEERING_DRIVER_PORT_CLOCK,
-                                               STEERING_DRIVER_PORT_BASE,
-                                               STEERING_PULSE_PIN,
-                                               STEERING_DIRECTION_PIN,
-                                               STEERING_ENABLE_PIN,
-                                               STEERING_STEP_DELAY
-                                              };
+                                      STEERING_DRIVER_PORT_BASE,
+                                      STEERING_PULSE_PIN,
+                                      STEERING_DIRECTION_PIN,
+                                      STEERING_ENABLE_PIN,
+                                      STEERING_STEP_DELAY
+};
 
 static StepperConfig *steeringPtr = &Steering_Args;
 
@@ -64,17 +64,28 @@ void vTask_Stepper(void *pvParameters)
 
     /* initial condition of the motor*/
     float desiredOrientation=0;
+    float ROMOrientation=0;
     int32_t movedSteps=0;
-    int32_t  stepsDesired = 0;
+    int32_t stepsDesired = 0;
+
+//    EEPROMRead((uint32_t *) &desiredOrientation, 0x400, sizeof(ROMOrientation));
+//    stepsDesired = f_DecodeOrientationIntoSteering(-1*ROMOrientation);
+//    movedSteps = int32_Move_Stepper(NULL, movedSteps, stepsDesired, steeringPtr);
+//    movedSteps = 0;
 
     while(1)
     {
-
         /* QUEUE BLOCKING */
         /* Get new input passed by queue*/
         xQueueReceive(Queue_Desired_Orientation,
                       &desiredOrientation,
                       portMAX_DELAY);
+
+//        if (ROMOrientation != desiredOrientation)
+//        {
+//            EEPROMProgram((uint32_t *) &desiredOrientation, (uint32_t)0x400, sizeof(desiredOrientation));
+//            ROMOrientation = desiredOrientation;
+//        }
 
         /*Decode orientation passed to queue to steering*/
         stepsDesired=f_DecodeOrientationIntoSteering(desiredOrientation);

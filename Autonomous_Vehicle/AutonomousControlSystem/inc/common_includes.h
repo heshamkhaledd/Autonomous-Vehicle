@@ -10,6 +10,7 @@
 #include "inc/hw_sysctl.h"
 #include "inc/hw_types.h"
 #include "inc/hw_ints.h"
+#include "inc/hw_eeprom.h"
 
 
 /* Tiva-Ware Library Drivers Includes */
@@ -20,6 +21,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/rom.h"
 #include "driverlib/rom_map.h"
+#include "driverlib/eeprom.h"
 
 /*FreeRtos*/
 #include <FreeRTOS.h>

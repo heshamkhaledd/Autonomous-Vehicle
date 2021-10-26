@@ -23,7 +23,6 @@ uint8_t dataFromHost2[8];
 uint8_t dataFromHost3[3];
 bool g_bUSBConfigured = false;
 
-#define TESTING_ON_LAPTOP
 
 /******************************************************************************
  *
@@ -177,6 +176,7 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
         dataFromHost1[7] = '\0';
         dataFromHost2[7] = '\0';
         dataFromHost3[2] = '\0';
+        xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
         /*we have a new packet incoming*/
     }
 #endif
@@ -300,6 +300,7 @@ void vTASK_USBTransmit (void * params)
 {
     /*We need a queue here to communicate with the received data from UART "in a string format" 
     to send it back to the processor*/
+    vTaskSuspend(NULL);
     uint8_t FeedbackDataToTransmit[5];
     while(1)
     {
