@@ -17,13 +17,15 @@
  *                           Preprocessor Definies                             *
  *******************************************************************************/
 /* steering Configurations */
-#define STEERING_STEP 0.45
-#define ORIENT_TO_STEERING_PARAM 3.5
+#define STEERING_STEP 0.45f
+#define ORIENT_TO_STEERING_PARAM 3.5f
 #define WRAP_AROUND_CORRECTION_FACTOR 360.0f
 
 /* These Values are Tested Physically. Date: 22/11/2020 */
 #define MAX_ORIENTATION 26
 #define MIN_ORIENTATION -24
+#define MAX_ORIENTATION_2 24
+#define MIN_ORIENTATION_2 -26
 
 /*Orientation related defines*/
 #define POSITIVE_TO_NEGATIVE_WRAP_AROUND    1
@@ -48,5 +50,6 @@ typedef int8_t WRAP_AROUND_FLAG;
 WRAP_AROUND_FLAG int8_getOrientationWrapAroundFlag(float a_currentOrientation, float a_desiredOrienatation);
 void v_adjustDesiredOrientaion(WRAP_AROUND_FLAG a_wrapAroundFlag, float currentOrientation, float * a_desiredOrientationPtr);
 long f_DecodeOrientationIntoSteering (float a_desiredOrientation);
+long f_DecodeResetOrientation (float a_desiredOrientation);
 
 #endif /*ORIENT_STEER_UTILS_H*/

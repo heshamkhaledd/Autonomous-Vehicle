@@ -62,9 +62,9 @@ int main(void)
 
     MAP_IntMasterEnable();                                                                      /* Enable Global Interrupt-bit */
 
-//    SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
-//    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_EEPROM0)){}
-//    EEPROMInit();
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_EEPROM0)){}
+    EEPROMInit();
 
     /* Creating the Queues and storing their addresses in their handles */
     Queue_Current_Orientation = xQueueCreate(1,4);
@@ -77,7 +77,7 @@ int main(void)
     vInit_throttle_Tasks();
     vInit_USBTasks();
     //UART1_Init(115200);
-   // vInit_UART();
+    //vInit_UART();
 
         /* Prototype for xTaskCreate:
         *

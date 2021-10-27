@@ -16,8 +16,6 @@
 SemaphoreHandle_t Sem_USBReceive;
 SemaphoreHandle_t Sem_USBTransmit;
 
-
-
 uint8_t dataFromHost1[8];
 uint8_t dataFromHost2[8];
 uint8_t dataFromHost3[3];

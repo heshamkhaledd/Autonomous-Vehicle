@@ -1,4 +1,4 @@
- /******************************************************************************
+/******************************************************************************
  *
  * File Name:   orientation_decoding.c
  *
@@ -28,11 +28,11 @@ WRAP_AROUND_FLAG int8_getOrientationWrapAroundFlag(float a_currentOrientation, f
     /*check for positive to negative wrap around*/
     if(CHECK_POSITIVE_ANGLE(a_currentOrientation) && a_desiredOrienatation>180)
         return POSITIVE_TO_NEGATIVE_WRAP_AROUND;
-    
+
     /*check for negative to positive wrap aorund*/
     if(CHECK_NEGATIVE_ANGLE(a_currentOrientation) && a_desiredOrienatation<-180)
         return NEGATIVE_TO_POSITIVE_WRAP_AROUND;
-    
+
     /*No wrap around, return -1*/
     return -1;
 }
@@ -76,9 +76,24 @@ long f_DecodeOrientationIntoSteering (float a_desiredOrientation)
     a_desiredOrientation=a_desiredOrientation>MAX_ORIENTATION ? MAX_ORIENTATION:a_desiredOrientation;
     a_desiredOrientation=a_desiredOrientation<MIN_ORIENTATION ? MIN_ORIENTATION:a_desiredOrientation;
 
-    long steeringDegrees=a_desiredOrientation * (float)ORIENT_TO_STEERING_PARAM;
-    
-    /*Multiplying by motor factor*/
-    steeringDegrees= (long)((steeringDegrees) / STEERING_STEP);
-    return steeringDegrees ;
+    return ((long)(a_desiredOrientation * (ORIENT_TO_STEERING_PARAM/STEERING_STEP)));
+
+//    return (a_desiredOrientation * (float)ORIENT_TO_STEERING_PARAM / STEERING_STEP);
+//    /*Multiplying by motor factor*/
+//    steeringDegrees= (long)(steeringDegrees / STEERING_STEP);
+//    return steeringDegrees ;
+}
+
+long f_DecodeResetOrientation (float a_desiredOrientation)
+{
+    a_desiredOrientation=a_desiredOrientation>MAX_ORIENTATION_2 ? MAX_ORIENTATION_2:a_desiredOrientation;
+    a_desiredOrientation=a_desiredOrientation<MIN_ORIENTATION_2 ? MIN_ORIENTATION_2:a_desiredOrientation;
+
+    return ((long)(a_desiredOrientation * (ORIENT_TO_STEERING_PARAM/STEERING_STEP)));
+
+//    long steeringDegrees=a_desiredOrientation * (float)ORIENT_TO_STEERING_PARAM;
+//
+//    /*Multiplying by motor factor*/
+//    steeringDegrees= (long)((steeringDegrees) / STEERING_STEP);
+//    return steeringDegrees ;
 }

@@ -61,17 +61,19 @@ void vInit_Steppers_Tasks(void)
  *****************************************************************************/
 void vTask_Stepper(void *pvParameters)
 {
-
     /* initial condition of the motor*/
     float desiredOrientation=0;
     float ROMOrientation=0;
     int32_t movedSteps=0;
     int32_t stepsDesired = 0;
 
-//    EEPROMRead((uint32_t *) &desiredOrientation, 0x400, sizeof(ROMOrientation));
-//    stepsDesired = f_DecodeOrientationIntoSteering(-1*ROMOrientation);
-//    movedSteps = int32_Move_Stepper(NULL, movedSteps, stepsDesired, steeringPtr);
-//    movedSteps = 0;
+    EEPROMRead((uint32_t *) &desiredOrientation, 0x400, sizeof(desiredOrientation));
+
+    stepsDesired = f_DecodeResetOrientation(-1*desiredOrientation);
+
+    movedSteps = int32_Move_Stepper(NULL, movedSteps, stepsDesired, steeringPtr);
+    movedSteps = 0;
+    EEPROMProgram((uint32_t *) &movedSteps, (uint32_t)0x400, sizeof(movedSteps));
 
     while(1)
     {
@@ -81,12 +83,12 @@ void vTask_Stepper(void *pvParameters)
                       &desiredOrientation,
                       portMAX_DELAY);
 
-//        if (ROMOrientation != desiredOrientation)
-//        {
-//            EEPROMProgram((uint32_t *) &desiredOrientation, (uint32_t)0x400, sizeof(desiredOrientation));
-//            ROMOrientation = desiredOrientation;
-//        }
+        if (ROMOrientation != desiredOrientation)
+        {
 
+            EEPROMProgram((uint32_t *) &desiredOrientation, (uint32_t)0x400, sizeof(desiredOrientation));
+            ROMOrientation = desiredOrientation;
+        }
         /*Decode orientation passed to queue to steering*/
         stepsDesired=f_DecodeOrientationIntoSteering(desiredOrientation);
         /*Move motor by desired steps*/

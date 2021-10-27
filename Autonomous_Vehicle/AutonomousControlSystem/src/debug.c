@@ -91,4 +91,15 @@
         }
     }
 
+    void UART_sendString(uint32_t ui32Base, const uint8_t *Str)
+    {
+        /* Counter Declaration to be used to loop until string is sent. */
+        uint8_t i = 0;
 
+        while(Str[i] != '\0')
+        {
+            /* Send the characters one by one. */
+            UARTCharPut(ui32Base, Str[i]);
+            i++;
+        }
+    }
