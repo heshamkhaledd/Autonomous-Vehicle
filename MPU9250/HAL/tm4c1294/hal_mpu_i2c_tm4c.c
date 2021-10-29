@@ -45,47 +45,12 @@
  */
 void HAL_MPU_Init(void((*custHook)(void)))
 {
-    /*
-    //  Enable peripherals in use. Also reset I2C2 at the end to allow calling
-    //  this function at any point in order to reset I2C interface.
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C2);
-    MAP_SysCtlPeripheralReset(SYSCTL_PERIPH_I2C2);
-
-    // Enable I2C communication interface, SCL, SDA lines
-    MAP_GPIOPinConfigure(GPIO_PN4_I2C2SDA);
-    MAP_GPIOPinConfigure(GPIO_PN5_I2C2SCL);
-    MAP_GPIOPinTypeI2CSCL(GPIO_PORTN_BASE, GPIO_PIN_5);
-    MAP_GPIOPinTypeI2C(GPIO_PORTN_BASE, GPIO_PIN_4);
-
-    //  Enable I2C master interface
-    MAP_I2CMasterEnable(MPU9250_I2C_BASE);
-
-    // Run I2C bus in high-speed mode, 400kHz speed
-    MAP_I2CMasterInitExpClk(MPU9250_I2C_BASE, g_ui32SysClock, true);
-
-    //  Configure power-switch pin
-    MAP_GPIOPinTypeGPIOOutput(GPIO_PORTL_BASE, GPIO_PIN_4);
-    MAP_GPIOPinWrite(GPIO_PORTL_BASE, GPIO_PIN_4, 0x00);
-
-    //  Configure interrupt pin to receive output
-    //      (not used as actual interrupts)
-    MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-    MAP_GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_5);
-    MAP_GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x00);
-    */
-
-        /* Set the clock of the clock  80MHz*/
-       // MAP_SysCtlClockSet(SYSCTL_USE_PLL|SYSCTL_SYSDIV_2_5|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
-
         //Enable GPIO  Peripheral
         MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
 
-        MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
         /*Enable the Clock for PortF */
-        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+        MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
         // Enable the I2C0 peripheral
         MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
@@ -108,26 +73,17 @@ void HAL_MPU_Init(void((*custHook)(void)))
         // Run I2C bus in high-speed mode, 400kHz speed
          MAP_I2CMasterInitExpClk(MPU9250_I2C_BASE,g_ui32SysClock, true);
 
-        /* Enable Interrupts for Arbitration Lost, Stop, NAK, Clock Low ,Timeout and Data. */
-        //MAP_I2CMasterIntEnableEx(I2C0_BASE, (I2C_MASTER_INT_ARB_LOST |I2C_MASTER_INT_STOP | I2C_MASTER_INT_NACK |I2C_MASTER_INT_TIMEOUT | I2C_MASTER_INT_DATA));
-
         /* Enable the Interrupt in the NVIC from I2C Master */
           MAP_IntEnable(INT_I2C0);
 
-
-
             /*Make Pin 1,2,3 as Output Pin */
-            GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_1 );
+            MAP_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_1 );
 
-          //  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
-            //MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x00);
-            //  Configure interrupt pin to receive output
+            //  Configure interrupt pin(PA5) to receive output
             //      (not used as actual interrupts)
-            //will make indication to the interrupt as illuminate green led???????
-
-            SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
-            GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_5);
-            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x00);
+            MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+            MAP_GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_5);
+            MAP_GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x00);
 }
 
 /**
@@ -145,7 +101,7 @@ void HAL_MPU_PowerSwitch(bool powerState)
 
 /**
  * Check if MPU has raised interrupt to notify it has new data ready
- * @return true if interrupt pin is active, false otherwise
+ * @return true if interrupt pin(PA5) is active, false otherwise
  */
 bool HAL_MPU_DataAvail()
 {
