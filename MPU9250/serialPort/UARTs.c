@@ -27,13 +27,16 @@
 void UART0_Config()
 {
     /*Initialize the Clock System */
-      SysCtlClockSet(SYSCTL_USE_PLL|SYSCTL_SYSDIV_2_5|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
+  //  MAP_SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL |SYSCTL_CFG_VCO_480), 120000000);
 
+
+    SysCtlClockFreqSet((SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN),80000000);
+    //SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
       /*Enable the Clock for PortF */
       SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
       /*Make Pin 1,2 as Output Pin */
-      GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_2 | GPIO_PIN_1|GPIO_PIN_1);
+      GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_3| GPIO_PIN_1|GPIO_PIN_1);
 
       /* UART CONFIG */
       /*Enable clock for UART0*/

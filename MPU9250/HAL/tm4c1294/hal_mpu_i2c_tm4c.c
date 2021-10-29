@@ -77,11 +77,15 @@ void HAL_MPU_Init(void((*custHook)(void)))
     */
 
         /* Set the clock of the clock  80MHz*/
-        MAP_SysCtlClockSet(SYSCTL_USE_PLL|SYSCTL_SYSDIV_2_5|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
+       // MAP_SysCtlClockSet(SYSCTL_USE_PLL|SYSCTL_SYSDIV_2_5|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN);
 
         //Enable GPIO  Peripheral
         MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
 
+        MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+        /*Enable the Clock for PortF */
+        SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
         // Enable the I2C0 peripheral
         MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
@@ -91,9 +95,7 @@ void HAL_MPU_Init(void((*custHook)(void)))
 
         // Wait for the I2C0 module to be ready.
         while(!MAP_SysCtlPeripheralReady(SYSCTL_PERIPH_I2C0))
-        {
-        }
-
+        { }
         /* Configure Pins for I2C0 Master Interface */
         MAP_GPIOPinConfigure(GPIO_PB2_I2C0SCL);
         MAP_GPIOPinConfigure(GPIO_PB3_I2C0SDA);
@@ -104,7 +106,7 @@ void HAL_MPU_Init(void((*custHook)(void)))
         MAP_I2CMasterEnable(MPU9250_I2C_BASE);
 
         // Run I2C bus in high-speed mode, 400kHz speed
-         MAP_I2CMasterInitExpClk(MPU9250_I2C_BASE, g_ui32SysClock, true);
+         MAP_I2CMasterInitExpClk(MPU9250_I2C_BASE,g_ui32SysClock, true);
 
         /* Enable Interrupts for Arbitration Lost, Stop, NAK, Clock Low ,Timeout and Data. */
         //MAP_I2CMasterIntEnableEx(I2C0_BASE, (I2C_MASTER_INT_ARB_LOST |I2C_MASTER_INT_STOP | I2C_MASTER_INT_NACK |I2C_MASTER_INT_TIMEOUT | I2C_MASTER_INT_DATA));
@@ -113,24 +115,19 @@ void HAL_MPU_Init(void((*custHook)(void)))
           MAP_IntEnable(INT_I2C0);
 
 
-            /*Enable the Clock for PortF */
-            SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
             /*Make Pin 1,2,3 as Output Pin */
             GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE,GPIO_PIN_1 );
 
-
-        //  Configure power-switch pin
-            MAP_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
-            MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x00);
-
+          //  MAP_GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_1);
+            //MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x00);
             //  Configure interrupt pin to receive output
             //      (not used as actual interrupts)
-            //will make indication to the interrupt as illuminate green led
-            MAP_GPIOPinTypeGPIOInput(GPIO_PORTF_BASE, GPIO_PIN_2);
-            MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_2, 0x00);
+            //will make indication to the interrupt as illuminate green led???????
 
-
+            SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+            GPIOPinTypeGPIOInput(GPIO_PORTA_BASE, GPIO_PIN_5);
+            GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_5, 0x00);
 }
 
 /**
@@ -141,9 +138,9 @@ void HAL_MPU_Init(void((*custHook)(void)))
 void HAL_MPU_PowerSwitch(bool powerState)
 {
     if (powerState)
-        MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0xFF);
+        MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x04);
     else
-        MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x00);
+        MAP_GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_1, 0x02);
 }
 
 /**
@@ -152,7 +149,7 @@ void HAL_MPU_PowerSwitch(bool powerState)
  */
 bool HAL_MPU_DataAvail()
 {
-    return (MAP_GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_2) != 0);
+    return (MAP_GPIOPinRead(GPIO_PORTA_BASE, GPIO_PIN_5) != 0);
 }
 
 /**

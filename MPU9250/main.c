@@ -468,7 +468,6 @@ int main(void)
    // SerialPort::GetI().InitHW();
     UART0_Config();
 
-    //DEBUG_WRITE("Initialized Uart... \n");
 
     UART0_SendString("Initialized Uart... \n");
 
@@ -496,7 +495,6 @@ int main(void)
     {
 
 
-        UART0_SendString("Initialized Uart .     .. \n");
 
         //  Check if MPU toggled interrupt pin
         //  (this example doesn't use actual interrupts, but polling)
@@ -527,23 +525,33 @@ int main(void)
             //  note: _FTOI_ is just a macro to print float numbers, it takes
             //  a float a splits it in 2 integers that are printed separately
 
-            UART0_SendString("Yaw angle is = ");
-            UART_sendNumber( _FTOI_I(rpy[0]));
-            UART0_SendChr('.');
-            UART_sendNumber( _FTOI_F(rpy[0]));
-            UART0_SendString("\r\n");
 
-            UART0_SendString("Pitch angle is = ");
-            UART_sendNumber( _FTOI_I(rpy[1]));
+            UART0_SendString("Yaw angle is = ");
+
+           UART_sendNumber(_FTOI_I(rpy[0]));
+
+
+            UART0_SendChr('.');
+
+            UART_sendNumber( _FTOI_F(rpy[0]));
+
+
+            UART0_SendString("\r\n\n");
+
+       //     UART_sendNumber(g_ui32SysClock);
+
+
+            UART0_SendString("Pitch angle is  = ");
+           UART_sendNumber( _FTOI_I(rpy[1]));
             UART0_SendChr('.');
             UART_sendNumber( _FTOI_F(rpy[1]));
-            UART0_SendString("\r\n");
+            UART0_SendString("\r\n\n");
 
-            UART0_SendString("Roll angle is = ");
+            UART0_SendString("Roll angle is    = ");
             UART_sendNumber( _FTOI_I(rpy[2]));
             UART0_SendChr('.');
             UART_sendNumber( _FTOI_F(rpy[2]));
-            UART0_SendString("\r\n");
+            UART0_SendString("\r\n\n");
 
 
             counter = 0;
