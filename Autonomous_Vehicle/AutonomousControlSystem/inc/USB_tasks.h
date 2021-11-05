@@ -35,16 +35,15 @@
  *                       Global Variables
  *****************************************************************/
 
-extern uint8_t * uint8_USBTx  ;
-extern uint8_t * uint8_USBRx  ;
+extern uint8_t * uint8_USBTx;
+extern uint8_t * uint8_USBRx;
 
-extern volatile UBaseType_t USBRecieveHighWaterMark ;
+extern volatile UBaseType_t USBRecieveHighWaterMark;
 
 /*****************************************************************
  *                       Semaphores
  *****************************************************************/
-
-extern SemaphoreHandle_t Sem_USBReceive ;
+extern SemaphoreHandle_t Sem_USBReceive;
 
 /*****************************************************************
  *                       Queues
@@ -54,9 +53,9 @@ extern QueueHandle_t Queue_Feedback;
  *                    TASKS Declaration
  *****************************************************************/
 
-extern void vTASK_USBReceive (void *) ;
-extern void vTASK_USBTransmit (void *) ;
-extern void vInit_USBTasks() ;
+extern void vTASK_USBReceive (void *);
+extern void vTASK_USBTransmit (void *);
+extern void vInit_USBTasks();
 
 
 

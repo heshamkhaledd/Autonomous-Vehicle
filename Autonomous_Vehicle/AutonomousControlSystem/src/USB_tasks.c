@@ -8,7 +8,11 @@
  *
  ******************************************************************************/
 #include <AutonomousControlSystem/inc/USB_tasks.h>
-//#define TESTING_ON_LAPTOP  /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
+
+#if 1   /* If we are testing using laptop (PuTTY) connected to Tiva-C, change 0 to 1, if not change it to 0 again*/
+#define TESTING_ON_LAPTOP
+#endif
+
 /*#define PACKET_SIZE 16*/      /*If we connect the board to Xavier we need to define the received packet size,
                                 initially it is 10 bytes (XXXoXXT) X stands for ascii numbers or minus sign. 
                                 Note: We can change it from here.*/
@@ -22,9 +26,6 @@ uint8_t dataFromHost1[8];
 uint8_t dataFromHost2[8];
 uint8_t dataFromHost3[3];
 bool g_bUSBConfigured = false;
-
-#define TESTING_ON_LAPTOP
-
 /******************************************************************************
  *
  * Function Name: USB_receiveString
@@ -306,7 +307,6 @@ void vTASK_USBTransmit (void * params)
         xQueueReceive(Queue_Feedback, (void *)FeedbackDataToTransmit, portMAX_DELAY);
         xSemaphoreTake(Sem_USBTransmit,portMAX_DELAY);
         USBBufferWrite((tUSBBuffer *)&g_sTxBuffer,FeedbackDataToTransmit,5);
-
     }
 }
 
