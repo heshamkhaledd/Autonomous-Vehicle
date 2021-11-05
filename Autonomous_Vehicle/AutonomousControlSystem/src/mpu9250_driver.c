@@ -18,12 +18,12 @@
   * Arguments:   MyMPU *myMPU
   * Return:      void
   *****************************************************************************/
-void vInit_MPU9250_Driver(MyMPU *myMPU)
+void vInit_MPU9250_Driver(MPU9250 *M)
  {
-     myMPU->M = GetP();
+     M = GetP();
 
      //initialize the MPU value
-     MPU9250_value_init(myMPU->M);
+     MPU9250_value_init(M);
 
      //  Initialize board and FPU
      HAL_BOARD_CLOCK_Init();
@@ -52,19 +52,21 @@ void vInit_MPU9250_Driver(MyMPU *myMPU)
  * Arguments:   MyMPU *myMPU
  * Return:      void
  *****************************************************************************/
-void MPU9250_ProvideData(MyMPU *myMPU)
+void MPU9250_ProvideData(MPU9250 *M, float *rpy, float *xyz)
 {
     //  Check if MPU toggled interrupt pin
     //  (this example doesn't use actual interrupts, but polling)
     if (HAL_MPU_DataAvail())
     {
-
         //  Read sensor data
-        ReadSensorData(myMPU->M);
+        ReadSensorData(M);
 
         //  Get RPY values
         /* get yaw pitch and roll values in degrees */
-        RPY(myMPU->rpy, true, myMPU->M);
+        RPY(rpy, true, M);
+
+        /* get the linear acceleration */
+        Linear_Acceleration(xyz ,M);
     }
 
     // INT pin can be held up for max 50us, so delay here to prevent reading the same data twice

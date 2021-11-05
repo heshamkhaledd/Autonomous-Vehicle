@@ -18,6 +18,7 @@
 #include "../MPU9250/libs/myLib.h"
 #include "../MPU9250/mpu9250/mpu9250.h"
 #if defined(__HAL_USE_MPU9250_DMP__)       //  Compile only if module is enabled
+#endif
 #include "../MPU9250/HAL/hal.h"
 #include "../MPU9250/libs/myLib.h"
 #include "../MPU9250/libs/helper_3dmath.h"
@@ -32,7 +33,7 @@ typedef struct {
     MPU9250 *M;
     float rpy[3];
     float xyz[3];
-    uint32_t counter = 0;
+    uint32_t counter;
 } MyMPU;
 
 /******************************************************************************
@@ -46,7 +47,7 @@ typedef struct {
  * Arguments:   MyMPU *myMPU
  * Return:      void
  *****************************************************************************/
-void vInit_MPU9250_Driver(MyMPU *myMPU);
+void vInit_MPU9250_Driver(MPU9250 *M);
 /******************************************************************************
  * Function Name: MPU9250_ProvideData
  *
@@ -55,5 +56,5 @@ void vInit_MPU9250_Driver(MyMPU *myMPU);
  * Arguments:   MyMPU *myMPU
  * Return:      void
  *****************************************************************************/
-void MPU9250_ProvideData(MyMPU *myMPU);
+void MPU9250_ProvideData(MPU9250 *M, float *rpy, float *xyz);
 #endif /* AUTONOMOUSCONTROLSYSTEM_INC_MPU9250_DRIVER_H_ */

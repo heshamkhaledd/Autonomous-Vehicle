@@ -181,7 +181,7 @@ int8_t InitSW()
     mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS);
     // Push accel and quaternion data into the FIFO.
     mpu_configure_fifo(INV_XYZ_ACCEL);
-    mpu_set_sample_rate(50);
+    mpu_set_sample_rate(MPU9252_RATE);
 
     // Initialize HAL state variables.
     memset(&hal, 0, sizeof(hal));

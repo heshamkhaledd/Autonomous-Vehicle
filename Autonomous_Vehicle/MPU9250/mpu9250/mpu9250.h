@@ -69,6 +69,7 @@
 //  Custom error codes for the library
 #define MPU_SUCCESS             0
 #define MPU_ERROR               2
+#define MPU9252_RATE            20
 
 #if defined(__HAL_USE_MPU9250_NODMP__)
     //  Mahony AHRS is used for computing orientation without DMP

@@ -7,20 +7,20 @@
 #include "../../libs/myLib.h"
 #include "hal_common_tm4c.h"
 
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_timer.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_gpio.h"
+#include "../../TivaWARE/inc/hw_memmap.h"
+#include "../../TivaWARE/inc/hw_types.h"
+#include "../../TivaWARE/inc/hw_timer.h"
+#include "../../TivaWARE/inc/hw_ints.h"
+#include "../../TivaWARE/inc/hw_gpio.h"
 
-#include "driverlib/rom_map.h"
-#include "driverlib/rom.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/fpu.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/pwm.h"
+#include "../../TivaWARE/driverlib/rom_map.h"
+#include "../../TivaWARE/driverlib/rom.h"
+#include "../../TivaWARE/driverlib/gpio.h"
+#include "../../TivaWARE/driverlib/pin_map.h"
+#include "../../TivaWARE/driverlib/sysctl.h"
+#include "../../TivaWARE/driverlib/fpu.h"
+#include "../../TivaWARE/driverlib/interrupt.h"
+#include "../../TivaWARE/driverlib/pwm.h"
 
 
 uint32_t g_ui32SysClock;

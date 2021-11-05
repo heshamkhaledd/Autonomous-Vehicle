@@ -9,8 +9,8 @@
 #if defined(__HAL_USE_MPU9250_DMP__)       //  Compile only if module is enabled
 
 #include "../HAL/hal.h"
-#include "libs/myLib.h"
-#include "libs/helper_3dmath.h"
+#include "../libs/myLib.h"
+#include "../libs/helper_3dmath.h"
 
 #include "eMPL/inv_mpu.h"
 #include "eMPL/inv_mpu_dmp_motion_driver.h"
@@ -25,7 +25,7 @@
 
 
 #ifdef __DEBUG_SESSION__
-#include "serialPort/UARTs.h"
+#include "../serialPort/UARTs.h"
 //#include "serialPort/uartHW.h"
 #endif
 

@@ -8,6 +8,7 @@
  *
  ******************************************************************************/
 #include <AutonomousControlSystem/inc/USB_tasks.h>
+#include <AutonomousControlSystem/inc/mpu9250_tasks.h>
 
 #if 1   /* If we are testing using laptop (PuTTY) connected to Tiva-C, change 0 to 1, if not change it to 0 again*/
 #define TESTING_ON_LAPTOP
@@ -18,9 +19,6 @@
                                 Note: We can change it from here.*/
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
-SemaphoreHandle_t Sem_USBTransmit;
-
-
 
 uint8_t dataFromHost1[8];
 uint8_t dataFromHost2[8];
@@ -164,10 +162,12 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
 #ifndef TESTING_ON_LAPTOP
     uint8_t bytegotfromusb;
     USBBufferRead((tUSBBuffer*) &g_sRxBuffer, &bytegotfromusb, 1);
+    // Xavior asks for data from MPU9250 [Yaw + x + y + z]
     if (bytegotfromusb == 'x')
     {
-        xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
+        // xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
         /*Give Transmit semaphore here to send feedback*/
+        xSemaphoreGiveFromISR(Sem_MPU9250_Provide_Data, NULL);
     }
     else if(bytegotfromusb == 'F')
     {
@@ -267,13 +267,16 @@ void vTASK_USBReceive (void *pvParameters)
     while(1)
     {
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
-        /*USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
+        /*
+        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
         USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost2,7);
         USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost3,2);
-        USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
-        /*dataFromHost1[7]='\0';
+        USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE);
+        // Line to echo the data to putty's terminal
+        dataFromHost1[7]='\0';
         dataFromHost2[7]='\0';
-        dataFromHost3[2]='\0';*/
+        dataFromHost3[2]='\0';
+        */
         State_Decoding (dataFromHost1, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
         State_Decoding (dataFromHost2, USB_MODULE);
         State_Decoding (dataFromHost3, USB_MODULE);/*Important question:
@@ -301,11 +304,12 @@ void vTASK_USBTransmit (void * params)
 {
     /*We need a queue here to communicate with the received data from UART "in a string format" 
     to send it back to the processor*/
-    uint8_t FeedbackDataToTransmit[5];
+    uint8_t FeedbackDataToTransmit[4];
     while(1)
     {
-        xQueueReceive(Queue_Feedback, (void *)FeedbackDataToTransmit, portMAX_DELAY);
-        xSemaphoreTake(Sem_USBTransmit,portMAX_DELAY);
+        /* We will receive just the data from MPU9250 task, then wrap it with identifiers like [a - x - y - z] */
+        xQueueReceive(Queue_MPU9250_Data, (void *)FeedbackDataToTransmit, portMAX_DELAY);
+#warning "The FeedbackDataToTransmit from MPU9250's Queue is not identical to the FeedbackDataToTransmit that will be written in the usb's buffer"
         USBBufferWrite((tUSBBuffer *)&g_sTxBuffer,FeedbackDataToTransmit,5);
     }
 }
@@ -327,7 +331,6 @@ void vInit_USBTasks()
 
     /* Creating Semaphores */
     Sem_USBReceive = xSemaphoreCreateBinary();
-    Sem_USBTransmit= xSemaphoreCreateBinary();
 
     /* Creating Tasks */
     xTaskCreate(vTASK_USBReceive,                       /* Task Address       */

@@ -12,7 +12,7 @@
 /*****************************************************************
  *                       Global Variables
  *****************************************************************/
-MyMPU myMPU;
+MPU9250 *M;
 
 /*****************************************************************
  *                       Semaphores
@@ -23,7 +23,7 @@ SemaphoreHandle_t Sem_MPU9250_Provide_Data;
 /*****************************************************************
  *                       Queues
  *****************************************************************/
-extern QueueHandle_t Queue_MPU9250_Data;
+QueueHandle_t Queue_MPU9250_Data;
 
 /******************************************************************************
  * Function Name: vInit_USBTasks
@@ -35,9 +35,9 @@ extern QueueHandle_t Queue_MPU9250_Data;
  *****************************************************************************/
 void vInit_MPU9250_Tasks(void)
 {
-    vInit_MPU9250_Driver(&myMPU);
+    vInit_MPU9250_Driver(M);
     Sem_MPU9250_Provide_Data = xSemaphoreCreateBinary();
-    Queue_MPU9250_Data = xQueueCreate(1, 3 * typedef(float));
+    Queue_MPU9250_Data = xQueueCreate(1, 4 * sizeof(float));
 
     xTaskCreate(vTASK_MPU9250_Processing,
                 "MPU9250_Processing",
@@ -50,11 +50,21 @@ void vInit_MPU9250_Tasks(void)
 
 void vTASK_MPU9250_getRPY(void *pvParameters)
 {
-
+    uint8_t FeedbackDataToTransmit[4];
+    float rpy[3];
+    float xyz[3];
     /* Super Loop */
     while(1)
     {
-        MPU9250_ProvideData(&myMPU);
-        xQueueSend(Queue_MPU9250_Data, (void*)(myMPU->rpy), portMAX_DELAY);
+        xSemaphoreTake(Sem_MPU9250_Provide_Data, portMAX_DELAY);
+        MPU9250_ProvideData(M, rpy, xyz);
+
+        /* Prepare the bucket */
+        FeedbackDataToTransmit[0] = rpy[2];
+        FeedbackDataToTransmit[1] = xyz[0];
+        FeedbackDataToTransmit[2] = xyz[1];
+        FeedbackDataToTransmit[3] = xyz[2];
+
+        xQueueSend(Queue_MPU9250_Data, (void*)(FeedbackDataToTransmit), portMAX_DELAY);
     }
 }

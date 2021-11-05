@@ -26,7 +26,7 @@
 #define USBReceive_prio 1
 #define USBTransmit_prio 1
 
-#define arr_size 5
+#define arr_size 4
 
 //needs refining after the final code
 #define USB_StackDepth 200
