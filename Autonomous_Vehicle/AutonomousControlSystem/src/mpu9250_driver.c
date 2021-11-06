@@ -66,7 +66,7 @@ void MPU9250_ProvideData(MPU9250 *M, float *rpy, float *xyz)
         RPY(rpy, true, M);
 
         /* get the linear acceleration */
-        Linear_Acceleration(xyz ,M);
+        Linear_XYZ(xyz,M);
     }
 
     // INT pin can be held up for max 50us, so delay here to prevent reading the same data twice

@@ -290,6 +290,7 @@ int8_t ReadSensorData(MPU9250*M)
     short gyro[3], accel[3], sensors;
     unsigned char more = 1;
     long quat[4];
+
     unsigned long sensor_timestamp;
     int cnt = 0;
 
@@ -343,6 +344,8 @@ int8_t ReadSensorData(MPU9250*M)
 
          dmp_GetYawPitchRoll((float*)(M->_ypr), &qt, &v);
 
+
+
          M->_quat[0] = qt.x;
          M->_quat[1] = qt.y;
          M->_quat[2] = qt.z;
@@ -356,6 +359,10 @@ int8_t ReadSensorData(MPU9250*M)
          M->_acc[0] = (float)accel[0]/32767.0;
          M->_acc[1] = (float)accel[1]/32767.0;
          M->_acc[2] = (float)accel[2]/32767.0;
+
+         /* get Linear Acceleration */
+         dmpGetLinearAccel((float*)(M->Linear_acc),(float*)(M->_acc), &v);
+
      }
 
      return retVal;
@@ -374,6 +381,19 @@ int8_t RPY(float* RPY, bool inDeg,MPU9250*M)
             RPY[i] = M->_ypr[i]*180.0/PI_CONST;
         else
             RPY[i] = M->_ypr[i];
+
+    return MPU_SUCCESS;
+}
+
+/**
+ * Copy Linear acceleration from internal buffer to user-provided one
+ * @param XYZ pointer to float buffer of size 3 to hold Linear acceleration X,Y,Z
+ * @return One of MPU_* error codes
+ */
+int8_t Linear_XYZ(float* XYZ,MPU9250*M)
+{
+    for (uint8_t i = 0; i < 3; i++)
+        XYZ[i]=M->Linear_acc[i];
 
     return MPU_SUCCESS;
 }
@@ -433,6 +453,7 @@ int8_t Magnetometer(float *mag)
     memset((void*)M->_gyro, 0, 3);
     memset((void*)M->_mag, 0, 3);
 }
+
 
 
 

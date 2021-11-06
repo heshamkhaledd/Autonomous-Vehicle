@@ -167,6 +167,10 @@ typedef struct MPU9250{
      volatile float _ypr[3];
      //  Acceleration [x,y,z]
      volatile float _acc[3];
+
+     //Linear Acceleration
+     volatile float Linear_acc[3];
+
      //  Gyroscope readings [x,y,z]
      volatile float _gyro[3];
      //  Magnetometer readings[x,y,z]

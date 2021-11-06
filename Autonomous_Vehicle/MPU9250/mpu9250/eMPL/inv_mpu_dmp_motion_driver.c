@@ -1367,6 +1367,16 @@ uint8_t dmp_GetYawPitchRoll(float *data, Quaternion *q, VectorFloat *gravity) {
     return 0;
 }
 
+uint8_t dmpGetLinearAccel(float *data, float*vRaw, VectorFloat *gravity)
+{
+    // get rid of the gravity component (+1g = +8192 in standard DMP FIFO packet, sensitivity is 2g)
+    data[0] = vRaw[0] - gravity -> x*8192;
+    data[1] = vRaw[1] - gravity -> y*8192;
+    data[2] = vRaw[2] - gravity -> z*8192;
+    return 0;
+}
+
+
 /**
  *  @}
  */
