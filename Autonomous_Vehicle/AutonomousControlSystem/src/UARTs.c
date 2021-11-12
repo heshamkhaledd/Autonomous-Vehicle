@@ -2,24 +2,10 @@
 
 #ifndef EXAMPLES_UARTS_C_
 #define EXAMPLES_UARTS_C_
-/*Tivaware includes */
-#include <stdbool.h>
-#include <stdint.h>
-#include "inc/hw_gpio.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_sysctl.h"
-#include "inc/hw_types.h"
-#include "driverlib/debug.h"
-#include "driverlib/gpio.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/uart.h"
-#include "driverlib/sysctl.h"
 
-/*This include for calling GPIO_Pin_Config()*/
-#include "driverlib/pin_map.h"
 
-#include "UARTs.h"
+
+#include "../inc/UARTs.h"
 
 
 
@@ -68,7 +54,7 @@ void UART0_SendString(const char * str)
 {
     uint32_t i = 0 ;
      while(str[i] != 0)
-        UART0_SendChr(str[i++]);
+         UARTCharPut(UART0_BASE,str[i++]);
 }
 
 /* Function Name: UART_sendNumber
@@ -95,23 +81,12 @@ void UART_sendNumber(uint32_t out)
         }
         while(i != -1)
         {
-            UART0_SendChr(c[i--]);
+            UARTCharPut(UART0_BASE,c[i--]);
         }
 
 }
 
 
-void UART0_SendChr(char chr)
-{
-      while((UART0_FR_R&UART_FR_TXFF) != 0);
-      UART0_DR_R = chr;
-}
-
-char UART0_ReadChr(void)
-{
-      while((UART0_FR_R&UART_FR_RXFE) != 0);
-      return((char)(UART0_DR_R&0xFF));
-}
 
 
 #endif /* EXAMPLES_UARTS_C_ */

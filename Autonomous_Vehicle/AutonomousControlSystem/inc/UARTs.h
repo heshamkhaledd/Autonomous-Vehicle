@@ -8,6 +8,22 @@
 #define UART_FR_RXFE            0x00000010  // UART Receive FIFO Empty
 
 #include <stdint.h>
+/*Tivaware includes */
+#include <stdbool.h>
+#include <stdint.h>
+#include "inc/hw_gpio.h"
+#include "inc/hw_ints.h"
+#include "inc/hw_memmap.h"
+#include "inc/hw_sysctl.h"
+#include "inc/hw_types.h"
+#include "driverlib/debug.h"
+#include "driverlib/gpio.h"
+#include "driverlib/interrupt.h"
+#include "driverlib/uart.h"
+#include "driverlib/sysctl.h"
+
+/*This include for calling GPIO_Pin_Config()*/
+#include "driverlib/pin_map.h"
 
 
 /*      Macro to short the expression needed to print to debug port     */
@@ -21,10 +37,8 @@
 /* public functions */
 void UART0_Config();
 void UART0_SendString(const char *);
-void UART0_SendInt(uint8_t);
 void UART_sendNumber(uint32_t out);
-void UART0_SendChr(char);
-char UART0_ReadChr(void);
+
 
 
 #endif /* EXAMPLES_UARTS_H_ */

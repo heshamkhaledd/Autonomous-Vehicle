@@ -65,6 +65,34 @@ void vTASK_MPU9250_getRPY(void *pvParameters)
         FeedbackDataToTransmit[2] = xyz[1];
         FeedbackDataToTransmit[3] = xyz[2];
 
+        /* send to uart */
+        UART0_SendString("Yaw angle is = ");
+        UART_sendNumber(_FTOI_I(rpy[2]));
+        UART0_SendChr('.');
+        UART_sendNumber( _FTOI_F(rpy[2]));
+        UART0_SendString("\r\n");
+
+
+        /* Send linear_Acceleration data */
+        UART0_SendString("Linear Acceleration in X direction = ");
+        UART_sendNumber(_FTOI_I(xyz[0]));
+        UART0_SendChr('.');
+        UART_sendNumber( _FTOI_F(xyz[0]));
+        UART0_SendString("\r\n");
+
+        UART0_SendString("Linear Acceleration in Y direction = ");
+        UART_sendNumber( _FTOI_I(xyz[1]));
+        UART0_SendChr('.');
+        UART_sendNumber( _FTOI_F(xyz[1]));
+        UART0_SendString("\r\n");
+
+        UART0_SendString("Linear Acceleration in Z direction =  ");
+        UART_sendNumber( _FTOI_I(xyz[2]));
+        UART0_SendChr('.');
+        UART_sendNumber( _FTOI_F(xyz[2]));
+        UART0_SendString("\r\n");
+
+
         xQueueSend(Queue_MPU9250_Data, (void*)(FeedbackDataToTransmit), portMAX_DELAY);
     }
 }

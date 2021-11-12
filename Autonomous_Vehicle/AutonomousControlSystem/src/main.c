@@ -73,6 +73,13 @@ int main(void)
     vInit_Steppers_Tasks();
     vInit_throttle_Tasks();
     vInit_USBTasks();
+
+
+    /* configure uart zero */
+    UART0_Config();
+
+    UART0_SendString("Initialized Uart... \n");
+
     //UART1_Init(115200);
    // vInit_UART();
 

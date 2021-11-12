@@ -25,7 +25,7 @@
 
 
 #ifdef __DEBUG_SESSION__
-#include "../serialPort/UARTs.h"
+#include <AutonomousControlSystem/inc/UARTs.h>
 //#include "serialPort/uartHW.h"
 #endif
 
