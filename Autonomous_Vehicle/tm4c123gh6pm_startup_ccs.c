@@ -60,16 +60,14 @@ extern void xPortSysTickHandler( void );
 extern void vPortSVCHandler( void );
 extern void xPortPendSVHandler( void );
 
-
 ///******USB handlers
 extern void USB0DeviceIntHandler(void);
 
-
 ///*****UART Handlers
-
 extern void UART1IntHandler(void);
 
-
+///*****QEI Handlers
+extern void QEI1IntHandler(void);
 
 //*****************************************************************************
 //
@@ -136,7 +134,7 @@ void (* const g_pfnVectors[])(void) =
     IntDefaultHandler,                      // Timer 3 subtimer A
     IntDefaultHandler,                      // Timer 3 subtimer B
     IntDefaultHandler,                      // I2C1 Master and Slave
-    IntDefaultHandler,                      // Quadrature Encoder 1
+    QEI1IntHandler,                      // Quadrature Encoder 1
     IntDefaultHandler,                      // CAN0
     IntDefaultHandler,                      // CAN1
     0,                                      // Reserved

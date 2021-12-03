@@ -17,13 +17,14 @@
  ******************************************************************************/
 
 #include <AutonomousControlSystem/inc/common_includes.h>
+#include <AutonomousControlSystem/inc/debug.h>
 #include <AutonomousControlSystem/inc/state_decoding.h>
 #include <AutonomousControlSystem/inc/steering_tasks.h>
 #include <AutonomousControlSystem/inc/throttle_tasks.H>
 #include <AutonomousControlSystem/inc/UART.h>
 #include <AutonomousControlSystem/inc/UART_tasks.h>
 #include <AutonomousControlSystem/inc/USB_tasks.h>
-#include "inc/hw_uart.h"
+#include <AutonomousControlSystem/inc/QEI.h>
 
 /* Tiva-Ware Drivers Includes */
 #include "driverlib/interrupt.h"

@@ -1,17 +1,5 @@
-#include <stdint.h>
-#include <stdbool.h>
-#include "driverlib/sysctl.h"
-#include "driverlib/gpio.h"
-#include "driverlib/uart.h"
-#include "driverlib/rom_map.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/rom.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_gpio.h"
-#include "inc/hw_sysctl.h"
-#include "inc/hw_uart.h"
+#include <AutonomousControlSystem/inc/debug.h>
+
 /******************************************************************************
  *
  * Function Name: UART0_init
@@ -26,21 +14,63 @@
 
     void UART0_init()
      {
-               /* Clock Enable for the peripherals (UART1, GPIOB) */
+        /* Clock Enable for the peripherals (UART1, GPIOB) */
         ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
         ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
-
-        ROM_IntMasterEnable();                /* Enable Processor Interrupts. */
+        /* Enable Processor Interrupts. */
+        ROM_IntMasterEnable();
 
         ROM_GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
         /* Configure the UART for 115,200, 8-N-1 operation. */
         ROM_UARTConfigSetExpClk(UART0_BASE, ROM_SysCtlClockGet(), 115200 ,
-                                (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                                    UART_CONFIG_PAR_NONE));
-
+                               (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                                UART_CONFIG_PAR_NONE));
      }
+
+/*****************************************************************************/
+/*                                 UART Functions                            */
+/*****************************************************************************/
+
+/*
+ * The reason in the next two UART functions, we added the ui32Base argument
+ * is because it would allow those functions to be generic to all UART modules
+ * in our MC.
+ */
+
+    void UART_receiveString(uint32_t ui32Base, uint8_t *Str)
+    {
+        /* Counter Declaration to be used to loop until string is sent. */
+        uint8_t i = 0;
+
+        /* Receive the first character to use it as initial sentinel for the loop. */
+        Str[i] = UARTCharGet (ui32Base);
+
+        /* Receive characters until the ENTER key is pressed. */
+        /* 13 is the ASCII equivalent for the ENTER button. */
+        while(Str[i] != 13)
+        {
+            /* Receive the next character that follows the initial sentinel we used. */
+            i++;
+            Str[i] = UARTCharGet (ui32Base);
+        }
+        /* Enter the NULL at the end, so the string would be valid. */
+        Str[i] = '\0';
+    }
+
+    void UART_sendString(uint32_t ui32Base, const uint8_t *Str)
+    {
+        /* Counter Declaration to be used to loop until string is sent. */
+        uint8_t i = 0;
+
+        while(Str[i] != '\0')
+        {
+            /* Send the characters one by one. */
+            UARTCharPut(ui32Base, Str[i]);
+            i++;
+        }
+    }
 
 /******************************************************************************
  *
@@ -88,18 +118,5 @@
         while(i != -1)
         {
             UARTCharPut (UART0_BASE, c[i--]);
-        }
-    }
-
-    void UART_sendString(uint32_t ui32Base, const uint8_t *Str)
-    {
-        /* Counter Declaration to be used to loop until string is sent. */
-        uint8_t i = 0;
-
-        while(Str[i] != '\0')
-        {
-            /* Send the characters one by one. */
-            UARTCharPut(ui32Base, Str[i]);
-            i++;
         }
     }

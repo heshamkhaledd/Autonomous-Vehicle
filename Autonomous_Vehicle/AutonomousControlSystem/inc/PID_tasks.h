@@ -16,7 +16,7 @@
 #include <AutonomousControlSystem/inc/PID_controller.h>
 
 /*******************************************************************************
- *                           Preprocessor Definies                             *
+ *                           Preprocessor Defines                              *
  *******************************************************************************/
 #define ERROR_FACTOR    0
 #define PID_STACK_DEPTH 200
