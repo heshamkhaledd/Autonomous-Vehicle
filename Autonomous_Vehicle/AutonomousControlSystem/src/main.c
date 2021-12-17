@@ -23,6 +23,7 @@
 #include <AutonomousControlSystem/inc/UART.h>
 #include <AutonomousControlSystem/inc/UART_tasks.h>
 #include <AutonomousControlSystem/inc/USB_tasks.h>
+#include <AutonomousControlSystem/src/MPU9250/mpu9250_tasks.h>
 #include "inc/hw_uart.h"
 
 /* Tiva-Ware Drivers Includes */
@@ -72,7 +73,9 @@ int main(void)
     vInit_Steppers_Tasks();
     vInit_throttle_Tasks();
     vInit_USBTasks();
-    //UART1_Init(115200);
+    vInit_MPU9250_Tasks();
+    UART0_Config();
+    // UART1_Init(9600);
    // vInit_UART();
 
         /* Prototype for xTaskCreate:

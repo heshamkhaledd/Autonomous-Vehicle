@@ -18,6 +18,7 @@
 #include "usblib/usb-ids.h"
 #include "usblib/device/usbdevice.h"
 #include "usblib/device/usbdcdc.h"
+#include "../src/MPU9250/mpu9250_tasks.h"
 
 /*****************************************************************
  *                      Static Configuration
