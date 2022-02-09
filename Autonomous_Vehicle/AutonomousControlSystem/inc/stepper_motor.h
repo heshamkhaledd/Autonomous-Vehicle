@@ -1,25 +1,25 @@
 /******************************************************************************
  *
- * File Name:   STEPPER.H
+ * File Name:   stepper_motor.h
  *
- * Description: Steering Motor header file, includes the intializing task, orientation
- *              to sterring decoding functions and the steering task.
+ * Description: Steering Motor header file, includes the initializing task,
+ *              orientation to steering decoding functions and the steering task.
  *
  * Date:        7/4/2021
  *
  ******************************************************************************/
 
-#ifndef STEPPER_H_
-#define STEPPER_H_
+#ifndef STEPPER_MOTOR_H_
+#define STEPPER_MOTOR_H_
 
 #include <AutonomousControlSystem/inc/common_includes.h>
 #include "portable.h"
 
-/****************************************************************
- *                       Structures                             *
-*****************************************************************/
+/*******************************************************************************
+*                              Structures                                      *
+********************************************************************************/
 
-/* Structure storing the pins and base port for a stepper motor*/
+/* Structure storing the configurations of the stepper motor*/
 typedef struct
 {
   uint32_t Port_Clock;
@@ -33,9 +33,8 @@ typedef struct
 
 /*******************************************************************************
 *                          Functions Prototypes                                *
-*******************************************************************************/
-void vInit_Stepper_Driver(StepperConfig *steeringPtr);
+********************************************************************************/
+void init_stepper_driver(StepperConfig *steeringPtr);
+int32_t int32_move_stepper(QueueHandle_t controllingQueue, int32_t currentSteps, int32_t desiredSteps, StepperConfig *steeringPtr);
 
-int32_t int32_Move_Stepper(QueueHandle_t controllingQueue, int32_t currentSteps, int32_t desiredSteps, StepperConfig *steeringPtr);
-
-#endif /* STEPPER_H_ */
+#endif /* STEPPER_MOTOR_H_ */

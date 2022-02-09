@@ -6,12 +6,13 @@
  */
 
 #include <AutonomousControlSystem/inc/PIDThrottle.h>
+#include <AutonomousControlSystem/inc/debug.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 
 /* Controller parameters */
-#define PID_KP  2.0f
+#define PID_KP  1.0f
 #define PID_KI  0.5f
 #define PID_KD  0.25f
 
@@ -44,6 +45,7 @@ void vPID_Init(void){
                  configMAX_PRIORITIES-PID_vTASK_PRIO,  /* Task Priority .    */
                  NULL);                                /* Task handle        */
 
+    PID_Block_Sem = xSemaphoreCreateBinary();
 }
 
 
@@ -52,83 +54,104 @@ void vPID_Task(void * pvParameters){
 
     float setpoint;
     float measurement;
+    uint32_t error;
 
-    /* Initialise PID controller */
+    /* Initialize PID controller */
     PIDController pid = { PID_KP, PID_KI, PID_KD,
                           PID_TAU,
                           PID_LIM_MIN, PID_LIM_MAX,
               PID_LIM_MIN_INT, PID_LIM_MAX_INT,
                           SAMPLE_TIME_S,
                           0,0,0,0,0 };
-    vInit_PID();
+
+    setpoint = 0;
+
+    /* Measurements will be received from the wheel encoder*/
+    measurement = 5.0;
 
     /* Simulate response using test system */
     //Should be received from queue
 
     while (1)
     {
+        xQueuePeek(Queue_Speed, &setpoint, portMAX_DELAY);
+
         //setpoint read from queue
         //measurement from wheel encoder global variable
 
         /*
         * Error signal
         */
-        float error = setpoint - measurement;
-
+        error = (uint32_t)(setpoint - measurement);
 
         /*
         * Proportional
         */
-        float proportional = pid.Kp * error;
+        uint32_t proportional = pid.Kp * error;
 
 
         /*
         * Integral
         */
-        pid.integrator = pid.integrator + 0.5f * pid.Ki * pid.T * (error + pid.prevError);
-        //pid.integrator = pid.integrator + pid.Ki * pid.T *error;
 
-        /* Anti-wind-up via integrator clamping */
-        if (pid.integrator > pid.limMaxInt) {
-
-            pid.integrator = pid.limMaxInt;
-
-        } else if (pid.integrator < pid.limMinInt) {
-
-            pid.integrator = pid.limMinInt;
-
-        }
-
-
-        /*
-        * Derivative (band-limited differentiator)
-        */
-        //pid.differentiator = pid.Kd * (error - pid.prevError)/pid.T;
-        pid.differentiator = -(2.0f * pid.Kd * (measurement - pid.prevMeasurement)   /* Note: derivative on measurement, therefore minus sign in front of equation! */
-                            + (2.0f * pid.tau - pid.T) * pid.differentiator)
-                            / (2.0f * pid.tau + pid.T);
-
+//        pid.integrator = pid.integrator + 0.5f * pid.Ki * pid.T * (error + pid.prevError);
+//        //pid.integrator = pid.integrator + pid.Ki * pid.T *error;
+//
+//        /* Anti-wind-up via integrator clamping */
+//        if (pid.integrator > pid.limMaxInt) {
+//
+//            pid.integrator = pid.limMaxInt;
+//
+//        } else if (pid.integrator < pid.limMinInt) {
+//
+//            pid.integrator = pid.limMinInt;
+//        }
+//
+//
+//        /*
+//        * Derivative (band-limited differentiator)
+//        */
+//        //pid.differentiator = pid.Kd * (error - pid.prevError)/pid.T;
+//        pid.differentiator = -(2.0f * pid.Kd * (measurement - pid.prevMeasurement)   /* Note: derivative on measurement, therefore minus sign in front of equation! */
+//                            + (2.0f * pid.tau - pid.T) * pid.differentiator)
+//                            / (2.0f * pid.tau + pid.T);
 
         /*
         * Compute output and apply limits
         */
-        pid.out = proportional + pid.integrator + pid.differentiator;
+        pid.out = proportional;
+        //pid.out = proportional + pid.integrator + pid.differentiator;
+
+        if (error > 2)
+        {
+            xQueueSend(Queue_Throttle_Orientation, &pid.out,0);
+
+            UART_sendString (UART0_BASE, "\n\r Sent PID Out from PID:  ");
+            UART0_send_num_in_ASCII (pid.out);
+
+            //xSemaphoreTake(PID_Block_Sem,portMAX_DELAY);
+
+            //for trial
+            measurement++;
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
 
 
         /* Store error and measurement for later use */
-        pid.prevError       = error;
-        pid.prevMeasurement = measurement;
+       // pid.prevError       = error;
+       // pid.prevMeasurement = measurement;
 
         //pid.out scaling to send to Queue_Throttle_Orientation
-        if (pid.out > pid.limMax) {
+//        if (pid.out > pid.limMax) {
+//
+//            pid.out = pid.limMax;
+//
+//        } else if (pid.out < pid.limMin) {
+//
+//            pid.out = pid.limMin;
+//
+//        }
 
-            pid.out = pid.limMax;
-
-        } else if (pid.out < pid.limMin) {
-
-            pid.out = pid.limMin;
-
-        }
         //send to queue (limMax is MaxThrottleOrientation scaled and so limMin)
     }
 

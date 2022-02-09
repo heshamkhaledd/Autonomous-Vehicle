@@ -1,17 +1,18 @@
-/*
- * USB_tasks.h
+/******************************************************************************
  *
- *  Created on: ???/???/????
- *      Author: Tefa
- */
-
+ * File Name:   USB_tasks.h
+ *
+ * Description: USB header file
+ *
+ * Date:        10/2/2020
+ *
+ ******************************************************************************/
 #ifndef AUTONOMOUSCONTROLSYSTEM_INC_USB_TASKS_H_
 #define AUTONOMOUSCONTROLSYSTEM_INC_USB_TASKS_H_
 
 #include <AutonomousControlSystem/inc/common_includes.h>
 #include <AutonomousControlSystem/inc/state_decoding.h>
-#include <AutonomousControlSystem/inc/state_decoding.h>
-#include <AutonomousControlSystem/inc/usb_serial_structs.h>
+#include <AutonomousControlSystem/inc/USB_serial_structs.h>
 #include "driverlib/usb.h"
 #include "usblib/usblib.h"
 #include "usblib/usbcdc.h"
@@ -34,7 +35,6 @@
 /*****************************************************************
  *                       Global Variables
  *****************************************************************/
-
 extern uint8_t * uint8_USBTx  ;
 extern uint8_t * uint8_USBRx  ;
 
@@ -43,21 +43,19 @@ extern volatile UBaseType_t USBRecieveHighWaterMark ;
 /*****************************************************************
  *                       Semaphores
  *****************************************************************/
-
 extern SemaphoreHandle_t Sem_USBReceive ;
 
 /*****************************************************************
  *                       Queues
  *****************************************************************/
 extern QueueHandle_t Queue_Feedback;
+extern QueueHandle_t Queue_Speed;
+
 /*****************************************************************
  *                    TASKS Declaration
  *****************************************************************/
-
 extern void vTASK_USBReceive (void *) ;
 extern void vTASK_USBTransmit (void *) ;
 extern void vInit_USBTasks() ;
-
-
 
 #endif /* AUTONOMOUSCONTROLSYSTEM_INC_USB_TASKS_H_ */

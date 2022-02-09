@@ -11,16 +11,20 @@
 #include <AutonomousControlSystem/inc/common_includes.h>
 #include <stdint.h>
 
+extern QueueHandle_t Queue_Speed;
+extern QueueHandle_t Queue_Throttle_Orientation;
+extern SemaphoreHandle_t PID_Block_Sem;
+
 #define ERROR_FACTOR    0
 #define PID_STACK_DEPTH 200
-#define PID_vTASK_PRIO  1
+#define PID_vTASK_PRIO  2
 
 #define Time_Interval 0.1
 
 typedef struct {
 
     /* Controller gains */
-    float Kp;
+    uint32_t Kp;
     float Ki;
     float Kd;
 
@@ -49,8 +53,7 @@ typedef struct {
 
 } PIDController;
 
-void PIDController_Init(void);
-extern void vInit_PID();
+void vPID_Init(void);
 void vPID_Task(void * pvParameters);
 
 #endif /* AUTONOMOUSCONTROLSYSTEM_INC_PIDTHROTTLE_H_ */

@@ -17,14 +17,15 @@
  ******************************************************************************/
 
 #include <AutonomousControlSystem/inc/common_includes.h>
-#include <AutonomousControlSystem/inc/debug.h>
 #include <AutonomousControlSystem/inc/state_decoding.h>
 #include <AutonomousControlSystem/inc/steering_tasks.h>
 #include <AutonomousControlSystem/inc/throttle_tasks.H>
-#include <AutonomousControlSystem/inc/UART.h>
-#include <AutonomousControlSystem/inc/UART_tasks.h>
 #include <AutonomousControlSystem/inc/USB_tasks.h>
 #include <AutonomousControlSystem/inc/QEI.h>
+#include <AutonomousControlSystem/inc/debug.h>
+#include <AutonomousControlSystem/inc/PIDThrottle.h>
+#include <AutonomousControlSystem/src/MPU9250/mpu9250_tasks.h>
+#include "inc/hw_uart.h"
 
 /* Tiva-Ware Drivers Includes */
 #include "driverlib/interrupt.h"
@@ -37,19 +38,13 @@
 #include "usblib/device/usbdcdc.h"
 #include "utils/ustdlib.h"
 
-/* Configurations Includes */
-
-
-
-
-
-
 /* Queues handles declarations */
 QueueHandle_t Queue_Desired_Orientation;
-QueueHandle_t Queue_Current_Orientation;
 QueueHandle_t Queue_Throttle_Orientation;
+QueueHandle_t Queue_Speed;
 QueueHandle_t Queue_Feedback;
 
+SemaphoreHandle_t PID_Block_Sem;
 
 int main(void)
 {
@@ -59,40 +54,34 @@ int main(void)
     MAP_FPULazyStackingEnable();
     MAP_FPUEnable();
 
-    MAP_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN); /* Set the clocking to run at 80 MHz from the PLL. */
+    /* Set the clocking to run at 80 MHz from the PLL. */
+    MAP_SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_XTAL_16MHZ | SYSCTL_OSC_MAIN);
 
-    MAP_IntMasterEnable();                                                                      /* Enable Global Interrupt-bit */
-
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_EEPROM0);
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_EEPROM0)){}
-    EEPROMInit();
+    /* Enable Global Interrupt-bit */
+    MAP_IntMasterEnable();
 
     /* Creating the Queues and storing their addresses in their handles */
-    Queue_Current_Orientation = xQueueCreate(1,4);
     Queue_Desired_Orientation = xQueueCreate(1,4);
     Queue_Throttle_Orientation = xQueueCreate(1,4);
+    Queue_Speed = xQueueCreate(1,5);
     Queue_Feedback = xQueueCreate(1,5);
 
+
     /* Initializing System's modules */
-    vInit_Steppers_Tasks();
-    vInit_throttle_Tasks();
+    init_steering_tasks();
+    init_throttle_tasks();
+
     vInit_USBTasks();
-    //UART1_Init(115200);
-    //vInit_UART();
 
-        /* Prototype for xTaskCreate:
-        *
-        *  BaseType_t xTaskCreate( TaskFunction_t pvTaskCode,
-        *                          const char * const pcName,
-        *                          uint16_t usStackDepth,
-        *                          void *pvParameters,
-        *                          UBaseType_t uxPriority,
-        *                          TaskHandle_t *pvCreatedTask);
-        */
+    UART0_init();
+    vPID_Init();
 
-    vTaskStartScheduler();  /* Run the Kernel's Scheduler */
 
-    /* UNREACHABLE CODE */
+    //QEI1_Init();
+    //vInit_MPU9250_Tasks();
+
+    /* Run the Kernel's Scheduler */
+    vTaskStartScheduler();
+
     while(1);
-
 }

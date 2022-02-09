@@ -13,28 +13,26 @@
 #include <AutonomousControlSystem/inc/common_includes.h>
 
 /*******************************************************************************
- *                           Preprocessor Definies                             *
+ *                           Preprocessor Defines                              *
  *******************************************************************************/
-#define Numbers_Ascii_Base 0x30
-#define Numbers_Ascii_Offset 9
+#define Numbers_Ascii_Base      0x30
+#define Numbers_Ascii_Offset    9
 
-#define PACKET_SIZE       5
+#define PACKET_SIZE     5
 
-#define UART_MODULE    0
-#define USB_MODULE     1
+#define UART_MODULE     0
+#define USB_MODULE      1
 
 /****************************************************
  *                Global Variables                  *
  ****************************************************/
-extern QueueHandle_t Queue_steering;
 extern QueueHandle_t Queue_Desired_Orientation;
-extern QueueHandle_t Queue_steering;
-extern QueueHandle_t Queue_Current_Orientation;
 extern QueueHandle_t Queue_Throttle_Orientation;
+extern QueueHandle_t Queue_Speed;
 
 /*******************************************************************************
  *                          Functions Prototypes                               *
  *******************************************************************************/
-void State_Decoding (uint8_t * Data, uint8_t Module);
+void state_decoding (uint8_t * Data);
 
 #endif /* STATE_DECODE_H_ */

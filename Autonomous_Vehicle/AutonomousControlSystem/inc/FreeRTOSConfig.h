@@ -24,7 +24,7 @@
 #define configUSE_TICKLESS_IDLE                 0
 #define configCPU_CLOCK_HZ 						80000000UL // 80MHz clock
 #define configTICK_RATE_HZ                      1000 // 1ms SysTick ticker
-#define configMAX_PRIORITIES                    8 // Adjustable but I kept it at 8 for kicks.
+#define configMAX_PRIORITIES                    3
 #define configMINIMAL_STACK_SIZE                128 // Idle task stack (in 32-bit words)
 #define configMAX_TASK_NAME_LEN                 16
 #define configUSE_16_BIT_TICKS                  0

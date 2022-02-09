@@ -9,8 +9,8 @@
 #include "inc/hw_gpio.h"                    // Defines Macros for GPIO hardware
 #include "inc/hw_sysctl.h"
 #include "inc/hw_types.h"                   // Defines common types and macros
-#include "inc/hw_eeprom.h"                  // Macros used when accessing the EEPROM
 #include "inc/hw_qei.h"                     // Macros used when accessing the QEI hardware
+
 
 /* Tiva-Ware Library Drivers Includes */
 #include "driverlib/debug.h"                // Macros for assisting debug of the driver library
@@ -20,9 +20,9 @@
 #include "driverlib/sysctl.h"               // Defines and macros for System Control API of DriverLib
 #include "driverlib/rom.h"                  // Defines and macros for ROM API of driverLi
 #include "driverlib/rom_map.h"
-#include "driverlib/eeprom.h"
 #include "driverlib/interrupt.h"            // Defines and macros for NVIC Controller API of DriverLib
 #include "driverlib/qei.h"                  // Prototypes for the Quadrature Encoder Driver
+
 
 /*FreeRtos*/
 #include <FreeRTOS.h>

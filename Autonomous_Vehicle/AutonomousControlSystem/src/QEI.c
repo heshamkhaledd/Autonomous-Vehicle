@@ -95,13 +95,13 @@ void QEI1IntHandler(void){
 
     #ifdef DEBUG_QEI
     UART_sendString (UART0_BASE, "\n\r Number of Pulses per period:  ");
-    UART_sendNumber (Pulses_per_period);
+    UART0_send_num_in_ASCII (Pulses_per_period);
     UART_sendString (UART0_BASE, "\n\r Total Distance in meters:  ");
-    UART_sendNumber (Total_distance);
+    UART0_send_num_in_ASCII (Total_distance);
     UART_sendString (UART0_BASE, "\n\r Velocity in meter/second:  ");
-    UART_sendNumber (Velocity_meter_per_second);
+    UART0_send_num_in_ASCII (Velocity_meter_per_second);
     UART_sendString (UART0_BASE, "\n\r Velocity in kilometer/hour:  ");
-    UART_sendNumber ((Velocity_meter_per_second * 3.6));
+    UART0_send_num_in_ASCII ((Velocity_meter_per_second * 3.6));
     UART_sendString (UART0_BASE, "---------------------------- \n\r");
     #endif
 }

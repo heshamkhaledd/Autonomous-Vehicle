@@ -34,6 +34,6 @@
 void UART0_init();
 void UART_receiveString (uint32_t ui32Base, uint8_t *Str);
 void UART_sendString (uint32_t ui32Base, const uint8_t *Str);
-void UART_sendNumber(int32_t decimalValue);
+void UART0_send_num_in_ASCII(int32_t decimalValue);
 
 #endif /* TEMPLATE_FILES_INC_DEBUG_H_ */

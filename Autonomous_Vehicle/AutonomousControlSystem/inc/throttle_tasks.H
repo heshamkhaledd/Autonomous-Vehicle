@@ -1,8 +1,9 @@
  /******************************************************************************
  *
- * File Name:   THROTTLE_TASKS.h
+ * File Name:   throttle_tasks.h
  *
- * Description: Throttle control header file
+ * Description: Throttle Motor header file, includes the initializing task and
+ *              the throttle task.
  *
  * Date:        10/2/2020
  *
@@ -13,16 +14,17 @@
 
 #include <AutonomousControlSystem/inc/common_includes.h>
 #include <AutonomousControlSystem/inc/stepper_motor.h>
+#include <AutonomousControlSystem/inc/debug.h>
 #include "portable.h"
 
 /*******************************************************************************
- *                           Preprocessor Definies                             *
+ *                           Preprocessor Defines                              *
  *******************************************************************************/
 
 /* Static Configuration */
-#define THROTTLE_vTASK_STACK_DEPTH 80
+#define THROTTLE_vTASK_STACK_DEPTH      80
 
-/* Throttle Driver Port&Pins configurations */
+/* Throttle Driver Port & Pins configurations */
  #define THROTTLE_DRIVER_PORT_CLOCK      SYSCTL_PERIPH_GPIOE
  #define THROTTLE_DRIVER_PORT_BASE       GPIO_PORTE_BASE
  #define THROTTLE_PULSE_PIN              GPIO_PIN_1
@@ -31,32 +33,39 @@
  #define THROTTLE_STEP_DELAY             10
  #define THROTTLE_vTASK_PRIO             2
 
-/* Stepper steps & angles parameters */
-/* 800 pulse/rev step 2.22 CONVERT_TO_ANGLES 0.45  */
-/* 3200 pulse/rev step 8.69 CONVERT_TO_ANGLES 0.1125*/
-/* 1600 pulse/rev step 4.44 CONVERT_TO_ANGLES 0.225*/
+/* Stepper Steps & Angles Parameters:
+ * Throttle stepper motor driver allows three different configurations regarding
+ * the number of pulses it outputs per revolution: 800,1600,3200.
+ *
+ * ANGLE_TO_THROTTLE_PARAM = (pulse/revolution)/360.
+ * THROTTLE_DRV_ANGLES_PER_STEP = 1/ANGLE_TO_THROTTLE_PARAM.
+ *
+ * Throttle Stepper Motor Configurations:
+ * 800  pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  2.22   -> THROTTLE_DRV_ANGLES_PER_STEP 0.45
+ * 1600 pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  4.44   -> THROTTLE_DRV_ANGLES_PER_STEP 0.225
+ * 3200 pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  8.69   -> THROTTLE_DRV_ANGLES_PER_STEP 0.1125
+*/
 
-#define STEP           2.22 
-#define CONVERT_TO_ANGLES 0.45 
+/* Stepper Steps & Angles Parameters: */
+#define ANGLE_TO_THROTTLE_PARAM         2.22f
+#define THROTTLE_DRV_ANGLES_PER_STEP    0.45f
 
-
-#define LOW            0
 /* range from MIN_ANGLE to MAX_ANGLE*/
-#define MAX_ANGLE   15
-#define MIN_ANGLE   -5
+#define MAX_ANGLE                       15
+#define MIN_ANGLE                       -5
 
-
-/*****************************************************************
- *                    Variables
- *****************************************************************/
-
+/*******************************************************************************
+*                               Variables                                      *
+********************************************************************************/
 /* Queue Handlers for data from USB */
 extern QueueHandle_t Queue_Throttle_Orientation;
+
+extern SemaphoreHandle_t PID_Block_Sem;
 
 /*******************************************************************************
 *                          Functions Prototypes                                *
 *******************************************************************************/
-extern void vInit_throttle_Tasks();
-extern void vTask_throttle(void *);
+extern void init_throttle_tasks();
+extern void vTask_Throttle(void *);
 
 #endif /* AUTONOMOUSCONTROLSYSTEM_INC_THROTTLE_TASKS_H_ */

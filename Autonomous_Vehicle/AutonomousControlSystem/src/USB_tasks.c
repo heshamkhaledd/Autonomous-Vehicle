@@ -8,10 +8,16 @@
  *
  ******************************************************************************/
 #include <AutonomousControlSystem/inc/USB_tasks.h>
-//#define TESTING_ON_LAPTOP  /*If we are testing using laptop(PuTTY) connected to Tiva C, define this macro*/
-/*#define PACKET_SIZE 16*/      /*If we connect the board to Xavier we need to define the received packet size,
-                                initially it is 10 bytes (XXXoXXT) X stands for ascii numbers or minus sign. 
-                                Note: We can change it from here.*/
+
+/* If we are testing using laptop (PuTTY) connected to TivaC, define this macro */
+//#define TESTING_ON_LAPTOP
+
+/* If we connect the board tQSo Xavier we need to define the received packet size,
+  initially it is 10 bytes (XXXoXXT) X stands for ASCII numbers or minus sign */
+/* Note: We can change it from here. */
+
+/*#define PACKET_SIZE 16*/
+
 /* Declaring Semaphores Handles */
 SemaphoreHandle_t Sem_USBReceive;
 SemaphoreHandle_t Sem_USBTransmit;
@@ -19,9 +25,10 @@ SemaphoreHandle_t Sem_USBTransmit;
 uint8_t dataFromHost1[8];
 uint8_t dataFromHost2[8];
 uint8_t dataFromHost3[3];
+
 bool g_bUSBConfigured = false;
 
-
+#define TESTING_ON_LAPTOP
 /******************************************************************************
  *
  * Function Name: USB_receiveString
@@ -35,9 +42,14 @@ bool g_bUSBConfigured = false;
  *****************************************************************************/
 void USB_receiveString(uint8_t *Str)
 {
+    /* Reading the value sent from PC,
+      this reads the latest 5 bytes received in the buffer*/
+    USBBufferRead((tUSBBuffer *)&g_sRxBuffer, Str, 5);
 
-    USBBufferRead((tUSBBuffer *)&g_sRxBuffer, Str,5 );  /*Reading the value sent from PC*/
-
+    /* If the latest character in the frame is "ENTER"
+       (As Echo in PuTTY is forced on), replace it with the NULL character,
+       if not, then the sent frame contains errors,
+       so flush what is inside the buffer */
     if (*(Str+4)== 13 )
     {
         *(Str+4) = '\0';
@@ -83,23 +95,22 @@ void USB_GetLineCoding(tLineCoding *psLineCoding)
  *****************************************************************************/
 static void USB_HardwareConfiguration (void )
 {
-
     /* Configure the required pins for USB operation AS AN ANALOG function pins.*/
-
     MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);                    /* Enable clock to GPIOD */
     MAP_GPIOPinTypeUSBAnalog(GPIO_PORTD_BASE, GPIO_PIN_5 | GPIO_PIN_4); /* PD4(PIN43):= (USB0D-) , PD5(PIN44):= (USB0D+) */
-
 
     /*Initialize Tx (Transmit) and Rx (Receive) Buffers */
     USBBufferInit(&g_sTxBuffer);
     USBBufferInit(&g_sRxBuffer);
 
-    USBStackModeSet(0, eUSBModeForceDevice, 0);     /* Configure the tiva c to be device(slave) mode on the bus) */
+    /* Configure the TivaC to be device(slave) mode on the bus) */
+    USBStackModeSet(0, eUSBModeForceDevice, 0);
 
-    USBDCDCInit(0, &g_sCDCDevice);    /* Configure handshaking to  start (Enum) */
+    /* Configure handshaking to  start (Enum) */
+    USBDCDCInit(0, &g_sCDCDevice);
 
-    ROM_IntEnable(INT_USB0);                        /*Enable USB0 Interrupt*/
-
+    /*Enable USB0 Interrupt*/
+    ROM_IntEnable(INT_USB0);
 }
 
 /*****************************************************************
@@ -109,32 +120,25 @@ static void USB_HardwareConfiguration (void )
 uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue, void *pvMsgData)
 {
     tLineCoding *pvdata = pvMsgData;
+
     switch(ui32Event)
     {
-
     case USB_EVENT_CONNECTED:
-
         g_bUSBConfigured = true;
         /*flushing the buffers*/
         USBBufferFlush(&g_sTxBuffer);
         USBBufferFlush(&g_sRxBuffer);
-
         break;
-
 
     case USB_EVENT_DISCONNECTED:
         g_bUSBConfigured = false;
-
         break;
-
 
     case USBD_CDC_EVENT_GET_LINE_CODING:
     case USBD_CDC_EVENT_SET_LINE_CODING:
         /*setting the USB serial configurations*/
-
         USB_GetLineCoding(pvdata);
         break;
-
 
     default:
         break;
@@ -147,9 +151,9 @@ uint32_t ControlHandler(void *pvCBData, uint32_t ui32Event,uint32_t ui32MsgValue
  *****************************************************************/
 uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
-    /*We don't need to do anything here as this handler will be called after we send the data in the Transmit task*/
+    /* We don't need to do anything here, as this handler
+       will be called after we send the data in the Transmit task */
     return(0);  
-
 }
 
 /*****************************************************************
@@ -157,31 +161,38 @@ uint32_t TxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
  *****************************************************************/
 uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,void *pvMsgData)
 {
+
 #ifndef TESTING_ON_LAPTOP
+
     uint8_t bytegotfromusb;
+
     USBBufferRead((tUSBBuffer*) &g_sRxBuffer, &bytegotfromusb, 1);
+
     if (bytegotfromusb == 'x')
     {
-        xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
         /*Give Transmit semaphore here to send feedback*/
+        xSemaphoreGiveFromISR(Sem_USBTransmit, NULL);
     }
     else if(bytegotfromusb == 'F')
     {
         USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost1, 7);
         USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost2, 7);
         USBBufferRead((tUSBBuffer*) &g_sRxBuffer, dataFromHost3, 2);
-        //USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
+
         dataFromHost1[7] = '\0';
         dataFromHost2[7] = '\0';
         dataFromHost3[2] = '\0';
-        xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
         /*we have a new packet incoming*/
     }
+
 #endif
+
 #ifdef TESTING_ON_LAPTOP
 
-    if(ui32Event == USB_EVENT_RX_AVAILABLE) /*Checking the receive event to give the semaphore*/
+    /* Checking the receive event to give the semaphore */
+    if(ui32Event == USB_EVENT_RX_AVAILABLE)
     {
+        /* Only give the semaphore when the buffer contains 5 bytes according to the frame XXXR or XXXT */
         if(ui32MsgValue == 5)
         {
             xSemaphoreGiveFromISR(Sem_USBReceive, NULL);
@@ -205,19 +216,23 @@ uint32_t RxHandler(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue,voi
  * Return:      void
  *
  *****************************************************************************/
+
 #ifdef TESTING_ON_LAPTOP
+
 void vTASK_USBReceive (void *pvParameters)
 {
+    /* Array to store the data sent form the USB */
     uint8_t dataFromHost[arr_size];
+
     while(1)
     {
+        /* Wait until USB receives a new frame */
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
 
+        /* Receive valid frame only in the array */
         USB_receiveString(dataFromHost);
 
-        //USBBufferRead(&g_sRxBuffer,&dataFromHost[i],1);
-        //USBBufferWrite(&g_sTxBuffer,&dataFromHost[i],1); /*Line to echo the data to putty's terminal*/
-
+        /* If the frame is valid, then send to the stepper motor through state_decoding */
         if (dataFromHost[arr_size-1]=='\0')
         {
             switch (dataFromHost[arr_size-2])
@@ -226,63 +241,31 @@ void vTASK_USBReceive (void *pvParameters)
             case 'r':
             case 'T':
             case 't':
-                State_Decoding (dataFromHost, USB_MODULE);
-                break;
-            default:
-                /*Invalid frame*/
+                state_decoding (dataFromHost);
                 break;
             }
         }
-        else
-        {
-            /*Invalid frame*/
-        }
-        //        uint8_t i=0;
-        //        if(dataFromHost[i] == 'O' || dataFromHost[i] == 'o' || dataFromHost[i] == 't' || dataFromHost[i] == 'T')
-        //        {
-        //            dataFromHost[i+1] = '\0';
-        //            State_Decoding (dataFromHost, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
-        //            i=0;
-        //        }
-        //        else if (dataFromHost[i] == 'e' || dataFromHost[i]=='E')
-        //        {
-        //            i = 0;
-        //        }
-        //        else
-        //        {
-        //            i++;
-        //        }
-
     }
 }
 #endif
 
-#ifndef TESTING_ON_LAPTOP 
+#ifndef TESTING_ON_LAPTOP
+
 void vTASK_USBReceive (void *pvParameters)
 {
-
     while(1)
     {
         xSemaphoreTake(Sem_USBReceive,portMAX_DELAY);
-        /*USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost1,7);
-        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost2,7);
-        USBBufferRead((tUSBBuffer *)&g_sRxBuffer,dataFromHost3,2);
-        USBBufferWrite(&g_sTxBuffer,dataFromHost,PACKET_SIZE); /*Line to echo the data to putty's terminal*/
-        /*dataFromHost1[7]='\0';
-        dataFromHost2[7]='\0';
-        dataFromHost3[2]='\0';*/
-        State_Decoding (dataFromHost1, USB_MODULE);/*Call the function that converts the string to a number then sends it to its queue*/
-        State_Decoding (dataFromHost2, USB_MODULE);
-        State_Decoding (dataFromHost3, USB_MODULE);/*Important question:
-         * 1- will the received data be as a one packet that has the data for throttle and steering together?
-         *   -> if yes, we need to edit state_Decoding function to handle something like this ['-','5','t','-','2','4','O','\0']
-         *   -> if No, we won't change state decoding function
-         *       but we must agree on a fixed packet size for the steering and throttling packet.
-         * */
+
+        state_decoding (dataFromHost1);
+        state_decoding (dataFromHost2);
+        state_decoding (dataFromHost3);
+
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 #endif
+
 /******************************************************************************
  *
  * Function Name: vTASK_USBTransmit
@@ -296,16 +279,22 @@ void vTASK_USBReceive (void *pvParameters)
  *****************************************************************************/
 void vTASK_USBTransmit (void * params)
 {
+#warning ("Not yet finished")
+
     /*We need a queue here to communicate with the received data from UART "in a string format" 
     to send it back to the processor*/
+
     vTaskSuspend(NULL);
+
     uint8_t FeedbackDataToTransmit[5];
+
     while(1)
     {
         xQueueReceive(Queue_Feedback, (void *)FeedbackDataToTransmit, portMAX_DELAY);
-        xSemaphoreTake(Sem_USBTransmit,portMAX_DELAY);
-        USBBufferWrite((tUSBBuffer *)&g_sTxBuffer,FeedbackDataToTransmit,5);
 
+        xSemaphoreTake(Sem_USBTransmit,portMAX_DELAY);
+
+        USBBufferWrite((tUSBBuffer *)&g_sTxBuffer,FeedbackDataToTransmit,5);
     }
 }
 

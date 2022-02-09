@@ -22,7 +22,7 @@
 //
 //*****************************************************************************
 
-#include <AutonomousControlSystem/inc/usb_serial_structs.h>
+#include <AutonomousControlSystem/inc/USB_serial_structs.h>
 
 //*****************************************************************************
 //
