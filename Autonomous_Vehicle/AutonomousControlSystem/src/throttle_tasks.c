@@ -11,9 +11,6 @@
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 
-/* Queue to send the measurement from to the PID*/
-extern QueueHandle_t Queue_Measurement;
-
 /*Defining the structure carrying the throttle stepper motor configurations*/
 static StepperConfig Throttle_Args = {THROTTLE_DRIVER_PORT_CLOCK,
                                                 THROTTLE_DRIVER_PORT_BASE,
@@ -65,7 +62,7 @@ void vTask_Throttle(void *pvParameters)
     QueueHandle_t Queue_angles_error = Queue_Throttle_Orientation;
 
     /* stores the current angle if needed in feedback */
-    float currentAngle;
+    float currentAngle = 0;
 
     /* stores the difference between the desired and current angle read from queue*/
     float angleError;
@@ -82,9 +79,6 @@ void vTask_Throttle(void *pvParameters)
         /* receiving the desired angle from USB */
         xQueueReceive(Queue_angles_error, &angleError, portMAX_DELAY);
 
-        /* determine the current angle of the throttle depending on the position of the motor */
-        currentAngle = movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
-
         /* determine the desired angle as the angleError represents the difference needs to be added to the current angle*/
         desiredAngle = angleError + currentAngle;
 
@@ -97,9 +91,18 @@ void vTask_Throttle(void *pvParameters)
          * get number of driver steps needed for the received throttle motor angle */
         desiredSteps = desiredAngle * ANGLE_TO_THROTTLE_PARAM;
 
+        movedSteps = int32_move_stepper(Queue_angles_error, movedSteps, desiredSteps, throttlePtr);
 
-        xQueueSend(Queue_Measurement, &currentAngle, portMAX_DELAY);
+        /* determine the current angle of the throttle depending on the position of the motor */
+        currentAngle = movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
 
+        UART_sendString (UART0_BASE, "\n\r current angle=  ");
+        UART0_send_num_in_ASCII (currentAngle);
+
+        xQueueSend(Queue_Measurement, &currentAngle,portMAX_DELAY);
+
+        UART_sendString (UART0_BASE, "\n\r current angle=  ");
+        UART0_send_num_in_ASCII (currentAngle);
         //xSemaphoreGive(PID_Block_Sem);
     }
 }

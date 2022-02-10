@@ -27,9 +27,6 @@
 #define SAMPLE_TIME_S 0.01f
 
 
-/* define queue for the Measurement */
-QueueHandle_t Queue_Measurement;
-
 /* Maximum run-time of simulation */
 #define SIMULATION_TIME_MAX 4.0f
 
@@ -69,7 +66,7 @@ void vPID_Task(void * pvParameters){
     setpoint = 0;
 
     /* Measurements will be received from the wheel encoder*/
-    measurement = 5.0;
+    measurement = 0;
 
     /* Simulate response using test system */
     //Should be received from queue
@@ -80,11 +77,15 @@ void vPID_Task(void * pvParameters){
 
         //setpoint read from queue
         //measurement from wheel encoder global variable
-
+        UART_sendString (UART0_BASE, "\n\r setpoint=  ");
+        UART0_send_num_in_ASCII (setpoint);
         /*
         * Error signal
         */
-        error = (uint32_t)(setpoint - measurement);
+        error = (uint32_t)setpoint - (uint32_t)measurement;
+
+        UART_sendString (UART0_BASE, "\n\r error=  ");
+        UART0_send_num_in_ASCII (error);
 
         /*
         * Proportional
@@ -133,12 +134,14 @@ void vPID_Task(void * pvParameters){
 
             //xSemaphoreTake(PID_Block_Sem,portMAX_DELAY);
 
+            xQueueReceive(Queue_Measurement, &measurement, portMAX_DELAY);
+
+            UART_sendString (UART0_BASE, "\n\r measurement=  ");
+            UART0_send_num_in_ASCII (measurement);
             //for trial
             //measurement++;
         }
-        xQueueReceive(Queue_Measurement, &measurement, portMAX_DELAY);
-
-        //vTaskDelay(pdMS_TO_TICKS(1000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
 
 
         /* Store error and measurement for later use */

@@ -13,13 +13,15 @@
 
 extern QueueHandle_t Queue_Speed;
 extern QueueHandle_t Queue_Throttle_Orientation;
+
+/* define queue for the Measurement */
+extern QueueHandle_t Queue_Measurement;
+
 extern SemaphoreHandle_t PID_Block_Sem;
-
-
 
 #define ERROR_FACTOR    0
 #define PID_STACK_DEPTH 200
-#define PID_vTASK_PRIO  1
+#define PID_vTASK_PRIO  2
 
 #define Time_Interval 0.1
 
