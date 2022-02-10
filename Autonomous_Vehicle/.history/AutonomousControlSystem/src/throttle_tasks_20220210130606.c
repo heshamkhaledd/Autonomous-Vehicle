@@ -97,6 +97,16 @@ void vTask_Throttle(void *pvParameters)
          * get number of driver steps needed for the received throttle motor angle */
         desiredSteps = desiredAngle * ANGLE_TO_THROTTLE_PARAM;
 
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> fcdd7040f8e80d1e2612a12d7e9f8059fa42b994
+        /* move motor by desired steps */
+        movedSteps = int32_move_stepper(Queue_angles_error, movedSteps, desiredSteps, throttlePtr);
+
+        UART_sendString (UART0_BASE, "\n\r Received in throttle and movedsteps=  ");
+        UART0_send_num_in_ASCII (movedSteps);
 
         xQueueSend(Queue_Measurement, &currentAngle, portMAX_DELAY);
 

@@ -19,7 +19,7 @@ extern SemaphoreHandle_t PID_Block_Sem;
 
 #define ERROR_FACTOR    0
 #define PID_STACK_DEPTH 200
-#define PID_vTASK_PRIO  2
+#define PID_vTASK_PRIO  1
 
 #define Time_Interval 0.1
 

@@ -80,7 +80,7 @@ void vTask_Throttle(void *pvParameters)
     while (1)
     {
         /* receiving the desired angle from USB */
-        xQueueReceive(Queue_angles_error, &angleError, portMAX_DELAY);
+        xQueueReceive(g, &angleError, portMAX_DELAY);
 
         /* determine the current angle of the throttle depending on the position of the motor */
         currentAngle = movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;

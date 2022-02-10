@@ -97,6 +97,11 @@ void vTask_Throttle(void *pvParameters)
          * get number of driver steps needed for the received throttle motor angle */
         desiredSteps = desiredAngle * ANGLE_TO_THROTTLE_PARAM;
 
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> fcdd7040f8e80d1e2612a12d7e9f8059fa42b994
 
         xQueueSend(Queue_Measurement, &currentAngle, portMAX_DELAY);
 
