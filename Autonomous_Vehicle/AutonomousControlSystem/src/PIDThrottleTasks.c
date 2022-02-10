@@ -125,7 +125,7 @@ void vPID_Task(void * pvParameters){
         pid.out = proportional;
         //pid.out = proportional + pid.integrator + pid.differentiator;
 
-        if (error > 2)
+        if (abs(error) > 2)
         {
             xQueueSend(Queue_Throttle_Orientation, &pid.out,0);
 
