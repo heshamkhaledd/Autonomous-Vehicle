@@ -11,6 +11,9 @@
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 
+/* Queue to send the measurement from to the PID*/
+extern QueueHandle_t Queue_Measurement;
+
 /*Defining the structure carrying the throttle stepper motor configurations*/
 static StepperConfig Throttle_Args = {THROTTLE_DRIVER_PORT_CLOCK,
                                                 THROTTLE_DRIVER_PORT_BASE,
@@ -64,7 +67,10 @@ void vTask_Throttle(void *pvParameters)
     /* stores the current angle if needed in feedback */
     float currentAngle;
 
-    /* stores the desired angle read from queue */
+    /* stores the error from the queue */
+    float error;
+
+    /* stores the desired angle from the PID (will be the current angle + error */
     float desiredAngle;
 
     /* stores the number of pulses generated on the stepper */
@@ -74,7 +80,13 @@ void vTask_Throttle(void *pvParameters)
     while (1)
     {
         /* receiving the desired angle from USB */
-        xQueueReceive(Queue_angles_desired, &desiredAngle, portMAX_DELAY);
+        xQueueReceive(Queue_angles_desired, &error, portMAX_DELAY);
+
+        /* determine the current angle of the throttle depending on the position of the motor */
+        currentAngle = movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
+
+        desiredAngle=currentAngle+error;
+
 
         /* Check if received steering angle/orientation exceeds the physical limits of our car,
          * if received orientation, exceeds in one direction, we limit it to our maximum     */
@@ -85,14 +97,15 @@ void vTask_Throttle(void *pvParameters)
          * get number of driver steps needed for the received throttle motor angle */
         desiredSteps = desiredAngle * ANGLE_TO_THROTTLE_PARAM;
 
-        /* determine the current angle of the throttle depending on the position of the motor */
-        currentAngle = movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
+
 
         /* move motor by desired steps */
         movedSteps = int32_move_stepper(Queue_angles_desired, movedSteps, desiredSteps, throttlePtr);
 
         UART_sendString (UART0_BASE, "\n\r Received in throttle and movedsteps=  ");
         UART0_send_num_in_ASCII (movedSteps);
+
+        xQueueSend(Queue_Measurement, &currentAngle, portMAX_DELAY);
 
         //xSemaphoreGive(PID_Block_Sem);
     }

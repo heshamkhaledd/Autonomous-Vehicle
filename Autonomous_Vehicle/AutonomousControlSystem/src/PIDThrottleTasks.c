@@ -27,6 +27,8 @@
 #define SAMPLE_TIME_S 0.01f
 
 
+/* define queue for the Measurement */
+QueueHandle_t Queue_Measurement;
 
 /* Maximum run-time of simulation */
 #define SIMULATION_TIME_MAX 4.0f
@@ -132,9 +134,11 @@ void vPID_Task(void * pvParameters){
             //xSemaphoreTake(PID_Block_Sem,portMAX_DELAY);
 
             //for trial
-            measurement++;
+            //measurement++;
         }
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        xQueueReceive(Queue_Measurement, &measurement, portMAX_DELAY);
+
+        //vTaskDelay(pdMS_TO_TICKS(1000));
 
 
         /* Store error and measurement for later use */
