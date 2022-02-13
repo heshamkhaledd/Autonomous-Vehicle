@@ -27,6 +27,7 @@
 #define SAMPLE_TIME_S 0.01f
 
 
+
 /* Maximum run-time of simulation */
 #define SIMULATION_TIME_MAX 4.0f
 
@@ -44,7 +45,7 @@ void vPID_Init(void){
                  configMAX_PRIORITIES-PID_vTASK_PRIO,  /* Task Priority .    */
                  NULL);                                /* Task handle        */
 
-    PID_Block_Sem = xSemaphoreCreateBinary();
+    //PID_Block_Sem = xSemaphoreCreateBinary();
 }
 
 
@@ -52,7 +53,7 @@ void vPID_Init(void){
 void vPID_Task(void * pvParameters){
 
     float setpoint;
-    float measurement;
+    uint32_t measurement;
     uint32_t error;
 
     /* Initialize PID controller */
@@ -77,6 +78,10 @@ void vPID_Task(void * pvParameters){
 
         //setpoint read from queue
         //measurement from wheel encoder global variable
+        #ifdef Measurment_From_Enchoder
+        xQueuePeek(Queue_Measurement_From_Wheel_Enchoder, &measurement, portMAX_DELAY);
+        #endif
+
         UART_sendString (UART0_BASE, "\n\r setpoint=  ");
         UART0_send_num_in_ASCII (setpoint);
         /*
@@ -134,7 +139,9 @@ void vPID_Task(void * pvParameters){
 
             //xSemaphoreTake(PID_Block_Sem,portMAX_DELAY);
 
+            #ifdef Measurment_From_Throttle
             xQueueReceive(Queue_Measurement, &measurement, portMAX_DELAY);
+            #endif
 
             UART_sendString (UART0_BASE, "\n\r measurement=  ");
             UART0_send_num_in_ASCII (measurement);

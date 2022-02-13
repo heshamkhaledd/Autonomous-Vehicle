@@ -43,9 +43,11 @@ QueueHandle_t Queue_Desired_Orientation;
 QueueHandle_t Queue_Throttle_Orientation;
 QueueHandle_t Queue_Speed;
 QueueHandle_t Queue_Feedback;
+QueueHandle_t Queue_Measurement_From_Wheel_Enchoder;
 QueueHandle_t Queue_Measurement;
 
-SemaphoreHandle_t PID_Block_Sem;
+SemaphoreHandle_t QEI_Block_Sem;
+
 
 int main(void)
 {
@@ -66,6 +68,7 @@ int main(void)
     Queue_Throttle_Orientation = xQueueCreate(1,4);
     Queue_Speed = xQueueCreate(1,5);
     Queue_Measurement = xQueueCreate(1,5);
+    Queue_Measurement_From_Wheel_Enchoder = xQueueCreate(1,5);
     Queue_Feedback = xQueueCreate(1,5);
 
 

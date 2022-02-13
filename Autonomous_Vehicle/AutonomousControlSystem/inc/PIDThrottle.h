@@ -17,6 +17,8 @@ extern QueueHandle_t Queue_Throttle_Orientation;
 /* define queue for the Measurement */
 extern QueueHandle_t Queue_Measurement;
 
+extern QueueHandle_t Queue_Measurement_From_Wheel_Enchoder;
+
 extern SemaphoreHandle_t PID_Block_Sem;
 
 #define ERROR_FACTOR    0
@@ -24,6 +26,14 @@ extern SemaphoreHandle_t PID_Block_Sem;
 #define PID_vTASK_PRIO  2
 
 #define Time_Interval 0.1
+
+
+/*
+#define Measurment_From_Enchoder
+*/
+
+/* for testing the PID only */
+#define Measurment_From_Throttle
 
 typedef struct {
 
