@@ -45,8 +45,6 @@ QueueHandle_t Queue_Speed;
 QueueHandle_t Queue_Feedback;
 QueueHandle_t Queue_Measurement;
 
-SemaphoreHandle_t PID_Block_Sem;
-
 int main(void)
 {
     /* Enable lazy stacking for interrupt handlers. This allows floating-point

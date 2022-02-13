@@ -111,6 +111,7 @@ void state_decoding (uint8_t * Data)
     float number = 0.0;
 
     number = f_ASCII_to_decimal (Data);
+
     switch(Data[letter_index])
     {
     case 'R':

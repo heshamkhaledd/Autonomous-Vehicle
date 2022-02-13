@@ -8,6 +8,7 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
+#define PID_DEBUG
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 
@@ -89,20 +90,18 @@ void vTask_Throttle(void *pvParameters)
 
         /* multiply the received angle with the ANGLE_TO_THROTTLE_PARAM, in order to
          * get number of driver steps needed for the received throttle motor angle */
-        desiredSteps = desiredAngle * ANGLE_TO_THROTTLE_PARAM;
+        desiredSteps = (int32_t)(desiredAngle * ANGLE_TO_THROTTLE_PARAM);
 
         movedSteps = int32_move_stepper(Queue_angles_error, movedSteps, desiredSteps, throttlePtr);
 
         /* determine the current angle of the throttle depending on the position of the motor */
-        currentAngle = movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
+        currentAngle = (float)movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
 
-        UART_sendString (UART0_BASE, "\n\r current angle=  ");
-        UART0_send_num_in_ASCII (currentAngle);
-
+#ifdef PID_DEBUG
         xQueueSend(Queue_Measurement, &currentAngle,portMAX_DELAY);
 
-        UART_sendString (UART0_BASE, "\n\r current angle=  ");
+        UART_sendString (UART0_BASE, "\n\r Current angle=");
         UART0_send_num_in_ASCII (currentAngle);
-        //xSemaphoreGive(PID_Block_Sem);
+#endif
     }
 }

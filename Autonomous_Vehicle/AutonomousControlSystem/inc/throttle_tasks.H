@@ -63,8 +63,6 @@ extern QueueHandle_t Queue_Throttle_Orientation;
 /* Queue to send the measurement from to the PID*/
 extern QueueHandle_t Queue_Measurement;
 
-extern SemaphoreHandle_t PID_Block_Sem;
-
 /*******************************************************************************
 *                          Functions Prototypes                                *
 *******************************************************************************/

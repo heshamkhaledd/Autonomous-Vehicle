@@ -17,8 +17,6 @@ extern QueueHandle_t Queue_Throttle_Orientation;
 /* define queue for the Measurement */
 extern QueueHandle_t Queue_Measurement;
 
-extern SemaphoreHandle_t PID_Block_Sem;
-
 #define ERROR_FACTOR    0
 #define PID_STACK_DEPTH 200
 #define PID_vTASK_PRIO  2
@@ -28,16 +26,12 @@ extern SemaphoreHandle_t PID_Block_Sem;
 typedef struct {
 
     /* Controller gains */
-    uint32_t Kp;
+    float Kp;
     float Ki;
     float Kd;
 
     /* Derivative low-pass filter time constant */
     float tau;
-
-    /* Output limits */
-    float limMin;
-    float limMax;
 
     /* Integrator limits */
     float limMinInt;
@@ -53,7 +47,7 @@ typedef struct {
     float prevMeasurement;      /* Required for differentiator */
 
     /* Controller output */
-    float out;
+    //float out;
 
 } PIDController;
 
