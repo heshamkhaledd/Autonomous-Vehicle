@@ -8,7 +8,8 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-#define PID_DEBUG
+/* for testing the PID only */
+#define PID_THROTTLE_DEBUG
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 
@@ -63,13 +64,13 @@ void vTask_Throttle(void *pvParameters)
     QueueHandle_t Queue_angles_error = Queue_Throttle_Orientation;
 
     /* stores the current angle if needed in feedback */
-    float currentAngle = 0;
+    float currentAngle = 0.0;
 
     /* stores the difference between the desired and current angle read from queue*/
-    float angleError;
+    float angleError = 0.0;
 
     /* stores the desired angle we need to reach */
-    float desiredAngle;
+    float desiredAngle = 0.0;
 
     /* stores the number of pulses generated on the stepper */
     int32_t movedSteps = 0;
@@ -97,7 +98,7 @@ void vTask_Throttle(void *pvParameters)
         /* determine the current angle of the throttle depending on the position of the motor */
         currentAngle = (float)movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
 
-#ifdef PID_DEBUG
+#ifdef PID_THROTTLE_DEBUG
         xQueueSend(Queue_Measurement, &currentAngle,portMAX_DELAY);
 
         UART_sendString (UART0_BASE, "\n\r Current angle=");

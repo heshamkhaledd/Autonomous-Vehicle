@@ -1,5 +1,6 @@
 /* -----------------------    Source Code Header File   --------------------- */
 #include <AutonomousControlSystem/inc/QEI.h>
+#include <AutonomousControlSystem/inc/PIDThrottle.h>
 
 /* -----------------------     Function Definitions     --------------------- */
 /******************************************************************************
@@ -62,9 +63,10 @@ void QEI1_Init (void){
  *****************************************************************************/
 
 void QEI1IntHandler(void){
+
+
     // Clear the Interrupt that is generated
     ROM_QEIIntClear(QEI1_BASE, ROM_QEIIntStatus(QEI1_BASE, true));
-
     /*
      * Calculate the Real Velocity of Vehicle in m/s and km/hr, by dividing the total number of pulses within the timer period (Pulses_Per_Period)
      * by the number of pulses that create a full revolution (QEI1_PPR) (Value is encoder specific, and is equal to 32 pulses), in order to
@@ -87,10 +89,11 @@ void QEI1IntHandler(void){
     Total_pulses = Total_pulses + Pulses_per_period;
     Total_distance = ((float)(Total_pulses * Wheel_Circumference)/QEI1_PPR);
 
+    /* May be changed to integer */
     Velocity_meter_per_second   = (Distance_per_period * VEL_INT_FREQ);
 
-    #ifndef DEBUG_QEI
-    // here write the code that sends the velocity to the required queue used in PID code.
+    #ifdef Measurment_From_Encoder
+    xQueueOverwrite(Queue_Measurement, &Velocity_meter_per_second);
     #endif
 
     #ifdef DEBUG_QEI

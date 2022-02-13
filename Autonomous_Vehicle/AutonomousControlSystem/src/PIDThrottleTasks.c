@@ -5,8 +5,6 @@
  *      Author: Daly
  */
 
-#define PID_DEBUG
-
 #include <AutonomousControlSystem/inc/PIDThrottle.h>
 #include <AutonomousControlSystem/inc/debug.h>
 #include <stdio.h>
@@ -94,8 +92,8 @@ void vPID_Task(void * pvParameters){
         /* Derivative (band-limited differentiator) */
         //pid.differentiator = pid.Kd * (error - pid.prevError)/pid.T;
         pid.differentiator = -(2.0f * pid.Kd * (enc_measurement - pid.prevMeasurement)   /* Note: derivative on measurement, therefore minus sign in front of equation! */
-                            + (2.0f * pid.tau - pid.T) * pid.differentiator)
-                            / (2.0f * pid.tau + pid.T);
+                + (2.0f * pid.tau - pid.T) * pid.differentiator)
+                                    / (2.0f * pid.tau + pid.T);
 
         /* Compute output and apply limits */
         //PID_out = proportional;
@@ -110,8 +108,13 @@ void vPID_Task(void * pvParameters){
             /* Let the change in throttle orientation appear in the car speed */
             vTaskDelay(pdMS_TO_TICKS(1000));
 
+#ifdef Measurment_From_Throttle
             /* Receive the car new speed to decide whether it needs a change in throttle orientation or not*/
             xQueueReceive(Queue_Measurement, &enc_measurement, portMAX_DELAY);
+#elif Measurment_From_Encoder
+            /* Receive the car new speed to decide whether it needs a change in throttle orientation or not*/
+            xQueuePeek(Queue_Measurement, &enc_measurement, portMAX_DELAY);
+#endif
         }
         else
         {
