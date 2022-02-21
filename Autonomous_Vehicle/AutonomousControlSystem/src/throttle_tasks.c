@@ -9,7 +9,7 @@
  *
  ******************************************************************************/
 /* for testing the PID only */
-#define PID_THROTTLE_DEBUG
+#define PID_THROTTLE_DEBUG_FROM_WORKSHOP
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 
@@ -98,9 +98,10 @@ void vTask_Throttle(void *pvParameters)
         /* determine the current angle of the throttle depending on the position of the motor */
         currentAngle = (float)movedSteps * THROTTLE_DRV_ANGLES_PER_STEP;
 
-#ifdef PID_THROTTLE_DEBUG
+#ifdef PID_THROTTLE_DEBUG_FROM_HOME
         xQueueSend(Queue_Measurement, &currentAngle,portMAX_DELAY);
-
+#endif
+#ifdef PID_THROTTLE_DEBUG_FROM_WORKSHOP
         UART_sendString (UART0_BASE, "\n\r Current angle=");
         UART0_send_num_in_ASCII (currentAngle);
 #endif

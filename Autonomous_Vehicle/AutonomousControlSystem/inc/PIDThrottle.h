@@ -26,8 +26,6 @@ extern QueueHandle_t Queue_Measurement;
 /* For tuning the encoder
 #define Measurment_From_Encoder
 */
-/* for testing the PID only */
-#define Measurment_From_Throttle
 
 typedef struct {
 

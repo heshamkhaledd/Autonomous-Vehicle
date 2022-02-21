@@ -62,9 +62,9 @@ int main(void)
     /* Creating the Queues and storing their addresses in their handles */
     Queue_Desired_Orientation = xQueueCreate(1,4);
     Queue_Throttle_Orientation = xQueueCreate(1,4);
-    Queue_Speed = xQueueCreate(1,5);
-    Queue_Measurement = xQueueCreate(1,5);
-    Queue_Feedback = xQueueCreate(1,5);
+    Queue_Speed = xQueueCreate(1,4);
+    Queue_Measurement = xQueueCreate(1,4);
+    Queue_Feedback = xQueueCreate(1,4);
 
 
     /* Initializing System's modules */
@@ -77,7 +77,7 @@ int main(void)
     vPID_Init();
 
 
-    //QEI1_Init();
+    QEI1_Init();
     //vInit_MPU9250_Tasks();
 
     /* Run the Kernel's Scheduler */

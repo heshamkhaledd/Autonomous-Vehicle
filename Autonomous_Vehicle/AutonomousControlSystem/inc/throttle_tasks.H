@@ -50,9 +50,10 @@
 #define ANGLE_TO_THROTTLE_PARAM         2.22f
 #define THROTTLE_DRV_ANGLES_PER_STEP    0.45f
 
+//to be tested
 /* range from MIN_ANGLE to MAX_ANGLE*/
-#define MAX_ANGLE                       15
-#define MIN_ANGLE                       -5
+#define MAX_ANGLE                       20
+#define MIN_ANGLE                       0
 
 /*******************************************************************************
 *                               Variables                                      *

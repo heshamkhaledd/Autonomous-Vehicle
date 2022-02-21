@@ -3,15 +3,16 @@
 #include <AutonomousControlSystem/inc/debug.h>
 
 // Comment this line if Terminal debugging (PuTTY) isn't required.
-#define DEBUG_QEI
+#define MEASUREMENT_FROM_ENCODER
+//#define DEBUG_QEI
 
-#define VEL_INT_FREQ         0.2f        // Macro to store the Interrupt frequency of QEI1. will be changed according to need of PID.
-#define QEI1_PPR             32          // Macro to store the PPR of the QEI1.
+#define VEL_INT_FREQ         0.5f        // Macro to store the Interrupt frequency of QEI1. will be changed according to need of PID.
+#define QEI1_PPR             103          // Macro to store the PPR of the QEI1.
 #define Wheel_Circumference  1.7522787f  // As car's diameter was measured manually to be equal to ... meters,
-                                        // hence, circumference = 2*PI*r = PI*d = ...
+// hence, circumference = 2*PI*r = PI*d = ...
 
 /* Queue to send the speed to the PID */
- extern QueueHandle_t Queue_Measurement;
+extern QueueHandle_t Queue_Measurement;
 
 
 /* -----------------------      Global Variables        --------------------- */
@@ -23,7 +24,7 @@ volatile uint32_t Total_pulses;          // Variable to store the number of puls
 volatile float Distance_per_period;      // Value in meters
 volatile float Total_distance;           // Value in meters
 
-volatile float Velocity_meter_per_second;
+ float Velocity_km_per_hour;
 
 /* -----------------------      Function Prototypes     --------------------- */
 void QEI1IntHandler(void);

@@ -90,10 +90,10 @@ void QEI1IntHandler(void){
     Total_distance = ((float)(Total_pulses * Wheel_Circumference)/QEI1_PPR);
 
     /* May be changed to integer */
-    Velocity_meter_per_second   = (Distance_per_period * VEL_INT_FREQ);
+    Velocity_km_per_hour   = (Distance_per_period * VEL_INT_FREQ)*3.6;
 
-    #ifdef Measurment_From_Encoder
-    xQueueOverwrite(Queue_Measurement, &Velocity_meter_per_second);
+    #ifdef MEASUREMENT_FROM_ENCODER
+    xQueueOverwrite(Queue_Measurement, &Velocity_km_per_hour);
     #endif
 
     #ifdef DEBUG_QEI
@@ -102,9 +102,9 @@ void QEI1IntHandler(void){
     UART_sendString (UART0_BASE, "\n\r Total Distance in meters:  ");
     UART0_send_num_in_ASCII (Total_distance);
     UART_sendString (UART0_BASE, "\n\r Velocity in meter/second:  ");
-    UART0_send_num_in_ASCII (Velocity_meter_per_second);
+    UART0_send_num_in_ASCII (Velocity_km_per_hour);
     UART_sendString (UART0_BASE, "\n\r Velocity in kilometer/hour:  ");
-    UART0_send_num_in_ASCII ((Velocity_meter_per_second * 3.6));
+    UART0_send_num_in_ASCII ((Velocity_km_per_hour / 3.6));
     UART_sendString (UART0_BASE, "---------------------------- \n\r");
     #endif
 }
