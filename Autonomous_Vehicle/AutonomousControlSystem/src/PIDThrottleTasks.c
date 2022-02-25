@@ -69,7 +69,7 @@ void vPID_Task(void * pvParameters){
 
     while (1)
     {
-        /* Set point read from queue */
+        /* Set point read from USB */
         xQueuePeek(Queue_Speed, &setpoint, portMAX_DELAY);
 
         /* Error signal */

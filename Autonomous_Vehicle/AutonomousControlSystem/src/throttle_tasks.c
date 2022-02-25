@@ -9,7 +9,8 @@
  *
  ******************************************************************************/
 /* for testing the PID only */
-#define PID_THROTTLE_DEBUG_FROM_WORKSHOP
+//#define PID_THROTTLE_DEBUG_FROM_WORKSHOP
+//#define TEST_STEPPER
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 
@@ -78,9 +79,13 @@ void vTask_Throttle(void *pvParameters)
 
     while (1)
     {
-        /* receiving the desired angle from USB */
+#ifdef TEST_STEPPER
+        xQueueReceive(Queue_Speed, &angleError, portMAX_DELAY);
+#endif
+#ifndef TEST_STEPPER
+        /* receiving the desired angle from PID */
         xQueueReceive(Queue_angles_error, &angleError, portMAX_DELAY);
-
+#endif
         /* determine the desired angle as the angleError represents the difference needs to be added to the current angle*/
         desiredAngle = angleError + currentAngle;
 

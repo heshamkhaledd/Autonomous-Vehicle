@@ -52,7 +52,7 @@
 
 //to be tested
 /* range from MIN_ANGLE to MAX_ANGLE*/
-#define MAX_ANGLE                       20
+#define MAX_ANGLE                       70
 #define MIN_ANGLE                       0
 
 /*******************************************************************************
@@ -60,6 +60,8 @@
 ********************************************************************************/
 /* Queue Handlers for data from USB */
 extern QueueHandle_t Queue_Throttle_Orientation;
+
+extern QueueHandle_t Queue_Speed;
 
 /* Queue to send the measurement from to the PID*/
 extern QueueHandle_t Queue_Measurement;
