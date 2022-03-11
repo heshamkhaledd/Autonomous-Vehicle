@@ -52,8 +52,10 @@
 
 //to be tested
 /* range from MIN_ANGLE to MAX_ANGLE*/
-#define MAX_ANGLE                       70
+#define MAX_ANGLE                       50
 #define MIN_ANGLE                       0
+
+//#define TEST_STEPPER
 
 /*******************************************************************************
 *                               Variables                                      *

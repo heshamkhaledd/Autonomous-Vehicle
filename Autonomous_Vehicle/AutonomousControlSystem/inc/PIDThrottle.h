@@ -23,9 +23,8 @@ extern QueueHandle_t Queue_Measurement;
 
 #define Time_Interval 0.1
 
-/* For tuning the encoder
-#define Measurment_From_Encoder
-*/
+/* for testing the PID only */
+//#define PID_THROTTLE_DEBUG_FROM_WORKSHOP
 
 typedef struct {
 

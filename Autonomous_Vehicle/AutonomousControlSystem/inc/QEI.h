@@ -5,8 +5,9 @@
 // Comment this line if Terminal debugging (PuTTY) isn't required.
 #define MEASUREMENT_FROM_ENCODER
 //#define DEBUG_QEI
+#define MATLAB_DRAWING
 
-#define VEL_INT_FREQ         0.5f        // Macro to store the Interrupt frequency of QEI1. will be changed according to need of PID.
+#define VEL_INT_FREQ         2.0f        // Macro to store the Interrupt frequency of QEI1. will be changed according to need of PID.
 #define QEI1_PPR             103          // Macro to store the PPR of the QEI1.
 #define Wheel_Circumference  1.7522787f  // As car's diameter was measured manually to be equal to ... meters,
 // hence, circumference = 2*PI*r = PI*d = ...

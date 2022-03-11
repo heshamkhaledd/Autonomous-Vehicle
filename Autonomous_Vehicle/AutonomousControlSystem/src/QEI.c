@@ -63,8 +63,6 @@ void QEI1_Init (void){
  *****************************************************************************/
 
 void QEI1IntHandler(void){
-
-
     // Clear the Interrupt that is generated
     ROM_QEIIntClear(QEI1_BASE, ROM_QEIIntStatus(QEI1_BASE, true));
     /*
@@ -101,10 +99,15 @@ void QEI1IntHandler(void){
     UART0_send_num_in_ASCII (Pulses_per_period);
     UART_sendString (UART0_BASE, "\n\r Total Distance in meters:  ");
     UART0_send_num_in_ASCII (Total_distance);
-    UART_sendString (UART0_BASE, "\n\r Velocity in meter/second:  ");
+    UART_sendString (UART0_BASE, "\n\r Velocity in km/h:  ");
     UART0_send_num_in_ASCII (Velocity_km_per_hour);
-    UART_sendString (UART0_BASE, "\n\r Velocity in kilometer/hour:  ");
+    UART_sendString (UART0_BASE, "\n\r Velocity in meter/sec:  ");
     UART0_send_num_in_ASCII ((Velocity_km_per_hour / 3.6));
     UART_sendString (UART0_BASE, "---------------------------- \n\r");
     #endif
+
+#ifdef MATLAB_DRAWING
+//    UART0_send_num_in_ASCII (Velocity_km_per_hour);
+//    UART_sendString (UART0_BASE, "\r\n");
+#endif
 }

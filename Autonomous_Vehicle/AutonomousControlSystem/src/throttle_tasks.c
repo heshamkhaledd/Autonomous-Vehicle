@@ -8,9 +8,6 @@
  * Date:        10/2/2020
  *
  ******************************************************************************/
-/* for testing the PID only */
-//#define PID_THROTTLE_DEBUG_FROM_WORKSHOP
-//#define TEST_STEPPER
 
 #include <AutonomousControlSystem/inc/throttle_tasks.h>
 

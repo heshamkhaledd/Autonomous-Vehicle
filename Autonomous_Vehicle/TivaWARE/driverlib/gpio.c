@@ -1997,6 +1997,8 @@ GPIOPinTypeQEI(uint32_t ui32Port, uint8_t ui8Pins)
     //
     GPIOPadConfigSet(ui32Port, ui8Pins, GPIO_STRENGTH_2MA,
                      GPIO_PIN_TYPE_STD_WPU);
+//    GPIOPadConfigSet(ui32Port, ui8Pins, GPIO_STRENGTH_2MA,
+//                     GPIO_PIN_TYPE_STD_WPD);
 }
 
 //*****************************************************************************

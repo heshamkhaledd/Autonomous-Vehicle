@@ -68,16 +68,16 @@ int main(void)
 
 
     /* Initializing System's modules */
-    init_steering_tasks();
+    //init_steering_tasks();
     init_throttle_tasks();
 
     vInit_USBTasks();
 
-    //UART0_init();
-    //vPID_Init();
+    UART0_init();
+    vPID_Init();
 
 
-    //QEI1_Init();
+    QEI1_Init();
     //vInit_MPU9250_Tasks();
 
     /* Run the Kernel's Scheduler */
