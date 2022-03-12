@@ -34,4 +34,10 @@
 /* Check if a specific bit is cleared in any register and return true if yes */
 #define BIT_IS_CLEAR(REG,BIT) ( !(REG & (1<<BIT)) )
 
+/*for printing floating number*/
+_CODE_ACCESS double      trunc(double x);
+_CODE_ACCESS float       truncf(float x);
+#define _FTOI_I(X) (int32_t)(truncf(X)) /* to get the number before floating point */
+#define _FTOI_F(X) (int32_t)fabs(truncf((X-truncf(X))*1000)) /* to get the number after floating point */
+
 #endif

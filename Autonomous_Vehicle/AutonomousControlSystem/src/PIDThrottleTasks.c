@@ -111,11 +111,15 @@ void vPID_Task(void * pvParameters){
         PID_out = proportional;
 //        PID_out = proportional + pid.integrator + pid.differentiator;
 //
-      UART_sendString (UART0_BASE, "\n\r PID_OUT:  ");
-      UART0_send_num_in_ASCII (PID_out);
+        UART_sendString (UART0_BASE, "\n\r PID_OUT:  ");
+        UART0_send_num_in_ASCII (_FTOI_I(PID_out));
+        UART_sendString (UART0_BASE, ".");
+        UART0_send_num_in_ASCII( _FTOI_F(PID_out));
 
         UART_sendString (UART0_BASE, "\n\r Error:  ");
-        UART0_send_num_in_ASCII (error);
+        UART0_send_num_in_ASCII (_FTOI_I(error));
+        UART_sendString (UART0_BASE, ".");
+        UART0_send_num_in_ASCII( _FTOI_F(error));
         /* When the error is too large (>1) we need to adjust the throttle orientation*/
 //        if (abs((int32_t)error) > 1)
 //        {
@@ -141,7 +145,9 @@ void vPID_Task(void * pvParameters){
         xQueuePeek(Queue_Measurement, &enc_measurement, portMAX_DELAY);
 #endif
         UART_sendString (UART0_BASE, "\n\r Measurement:  ");
-        UART0_send_num_in_ASCII (enc_measurement);
+        UART0_send_num_in_ASCII (_FTOI_I(enc_measurement));
+        UART_sendString (UART0_BASE, ".");
+        UART0_send_num_in_ASCII( _FTOI_F(enc_measurement));
 
         /* Store error and measurement for later use */
         pid.prevError       = error;

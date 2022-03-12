@@ -97,17 +97,30 @@ void QEI1IntHandler(void){
     #ifdef DEBUG_QEI
     UART_sendString (UART0_BASE, "\n\r Number of Pulses per period:  ");
     UART0_send_num_in_ASCII (Pulses_per_period);
+
     UART_sendString (UART0_BASE, "\n\r Total Distance in meters:  ");
-    UART0_send_num_in_ASCII (Total_distance);
+    UART0_send_num_in_ASCII (_FTOI_I(Total_distance));
+    UART_sendString (UART0_BASE, ".");
+    UART0_send_num_in_ASCII( _FTOI_F(Total_distance));
+
     UART_sendString (UART0_BASE, "\n\r Velocity in km/h:  ");
-    UART0_send_num_in_ASCII (Velocity_km_per_hour);
+    UART0_send_num_in_ASCII (_FTOI_I(Velocity_km_per_hour));
+    UART_sendString (UART0_BASE, ".");
+    UART0_send_num_in_ASCII( _FTOI_F(Velocity_km_per_hour));
+
+
     UART_sendString (UART0_BASE, "\n\r Velocity in meter/sec:  ");
-    UART0_send_num_in_ASCII ((Velocity_km_per_hour / 3.6));
+    UART0_send_num_in_ASCII (_FTOI_I(Velocity_km_per_hour / 3.6));
+    UART_sendString (UART0_BASE, ".");
+    UART0_send_num_in_ASCII( _FTOI_F((Velocity_km_per_hour / 3.6)));
+
     UART_sendString (UART0_BASE, "---------------------------- \n\r");
     #endif
 
 #ifdef MATLAB_DRAWING
-//    UART0_send_num_in_ASCII (Velocity_km_per_hour);
-//    UART_sendString (UART0_BASE, "\r\n");
+//     UART0_send_num_in_ASCII(_FTOI_I(Velocity_km_per_hour));
+//     UART_sendString (UART0_BASE, ".");
+//     UART0_send_num_in_ASCII( _FTOI_F(Velocity_km_per_hour));
+//     UART_sendString (UART0_BASE, "\r\n");
 #endif
 }
