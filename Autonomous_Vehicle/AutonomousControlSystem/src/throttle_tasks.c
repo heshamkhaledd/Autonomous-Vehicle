@@ -104,8 +104,16 @@ void vTask_Throttle(void *pvParameters)
         xQueueSend(Queue_Measurement, &currentAngle,portMAX_DELAY);
 #endif
 #ifdef PID_THROTTLE_DEBUG_FROM_WORKSHOP
+        UART_sendString (UART0_BASE, "\n\r Movedsteps=");
+        UART0_send_num_in_ASCII (movedSteps);
         UART_sendString (UART0_BASE, "\n\r Current angle=");
-        UART0_send_num_in_ASCII (currentAngle);
+        UART0_send_num_in_ASCII (_FTOI_I(currentAngle));
+        UART_sendString (UART0_BASE, ".");
+        UART0_send_num_in_ASCII( _FTOI_F(currentAngle));
+        UART_sendString (UART0_BASE, "\n\r DesiredAngle=");
+        UART0_send_num_in_ASCII (_FTOI_I(desiredAngle));
+        UART_sendString (UART0_BASE, ".");
+        UART0_send_num_in_ASCII( _FTOI_F(desiredAngle));
 #endif
     }
 }

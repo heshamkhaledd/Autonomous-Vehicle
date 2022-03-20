@@ -90,6 +90,19 @@ void QEI1IntHandler(void){
     /* May be changed to integer */
     Velocity_km_per_hour   = (Distance_per_period * VEL_INT_FREQ)*3.6;
 
+
+
+    // float Old_speed=New_speed;
+    // float New_speed=Velocity_km_per_hour;
+
+    //if(Old_speed == New_speed)
+    //{
+      //#ifdef MEASUREMENT_FROM_ENCODER
+      //xQueueOverwrite(Queue_Measurement, & New_speed);
+      //#endif
+    //}
+
+
     #ifdef MEASUREMENT_FROM_ENCODER
     xQueueOverwrite(Queue_Measurement, &Velocity_km_per_hour);
     #endif

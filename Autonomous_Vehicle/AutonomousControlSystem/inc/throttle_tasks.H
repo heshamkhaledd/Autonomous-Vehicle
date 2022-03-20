@@ -33,6 +33,7 @@
  #define THROTTLE_STEP_DELAY             10
  #define THROTTLE_vTASK_PRIO             2
 
+#define PID_THROTTLE_DEBUG_FROM_WORKSHOP
 /* Stepper Steps & Angles Parameters:
  * Throttle stepper motor driver allows three different configurations regarding
  * the number of pulses it outputs per revolution: 800,1600,3200.
@@ -43,17 +44,19 @@
  * Throttle Stepper Motor Configurations:
  * 800  pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  2.22   -> THROTTLE_DRV_ANGLES_PER_STEP 0.45
  * 1600 pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  4.44   -> THROTTLE_DRV_ANGLES_PER_STEP 0.225
- * 3200 pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  8.69   -> THROTTLE_DRV_ANGLES_PER_STEP 0.1125
+ * 3200 pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  8.89   -> THROTTLE_DRV_ANGLES_PER_STEP 0.1125
+ * 6400 pulse/revolution -> ANGLE_TO_THROTTLE_PARAM  17.78   -> THROTTLE_DRV_ANGLES_PER_STEP 0.05624
 */
 
+
 /* Stepper Steps & Angles Parameters: */
-#define ANGLE_TO_THROTTLE_PARAM         2.22f
-#define THROTTLE_DRV_ANGLES_PER_STEP    0.45f
+#define ANGLE_TO_THROTTLE_PARAM         17.78f
+#define THROTTLE_DRV_ANGLES_PER_STEP    0.05624f
 
 //to be tested
 /* range from MIN_ANGLE to MAX_ANGLE*/
-#define MAX_ANGLE                       50
-#define MIN_ANGLE                       0
+#define MAX_ANGLE                       25
+#define MIN_ANGLE                       10
 
 //#define TEST_STEPPER
 

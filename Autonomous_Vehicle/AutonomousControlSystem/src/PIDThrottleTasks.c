@@ -14,7 +14,7 @@
 #define MEASUREMENT_FROM_ENCODER
 
 /* Controller parameters */
-#define PID_KP  0.25f
+#define PID_KP  0.1f
 #define PID_KI  0.5f
 #define PID_KD  0.25f
 
@@ -50,6 +50,7 @@ void vPID_Task(void * pvParameters){
 
     /* Measurements will be received from the wheel encoder */
     float enc_measurement = 0.0;
+    float old_speed = 0.0;
 
     /* Variable to store the possible error between measurement and set point */
     float error = 0.0;
@@ -73,6 +74,9 @@ void vPID_Task(void * pvParameters){
         /* Set point read from USB */
         xQueuePeek(Queue_Speed, &setpoint, portMAX_DELAY);
 
+        setpoint = setpoint * 0.75 ;
+
+        UART_sendString (UART0_BASE, "\n\n\r________________________________________\n");
         counter++;
         UART_sendString (UART0_BASE, "\n\r Run no.:  ");
         UART0_send_num_in_ASCII (counter);
@@ -121,29 +125,35 @@ void vPID_Task(void * pvParameters){
         UART_sendString (UART0_BASE, ".");
         UART0_send_num_in_ASCII( _FTOI_F(error));
         /* When the error is too large (>1) we need to adjust the throttle orientation*/
-//        if (abs((int32_t)error) > 1)
-//        {
+        if ( (error > 0 && (enc_measurement-old_speed) < 0.2 ) || (error<0 && (enc_measurement-old_speed) > 0.2))
+        {
             /* Send the error in throttle orientation to the queue to adjust it */
             xQueueSend(Queue_Throttle_Orientation, &(PID_out),portMAX_DELAY);
 
-            /* Let the change in throttle orientation appear in the car speed */
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            UART_sendString (UART0_BASE, "\n\r Ba3atna:  PID_out");
 
 #ifdef MEASUREMENT_FROM_THROTTLE
             /* Receive the car new speed to decide whether it needs a change in throttle orientation or not*/
             xQueueReceive(Queue_Measurement, &enc_measurement, portMAX_DELAY);
 #endif
 
-//        }
-//        else
-//        {
-//            /* We don't need to read the speed more frequently than needed*/
-//            vTaskDelay(pdMS_TO_TICKS(500));
-//        }
+        }
+
+        /* Let the change in throttle orientation appear in the car speed */
+        vTaskDelay(pdMS_TO_TICKS(1000));
+
 #ifdef MEASUREMENT_FROM_ENCODER
+        old_speed = enc_measurement;
         /* Receive the car new speed to decide whether it needs a change in throttle orientation or not*/
         xQueuePeek(Queue_Measurement, &enc_measurement, portMAX_DELAY);
 #endif
+
+/* for new & old solution */
+//#ifdef MEASUREMENT_FROM_ENCODER
+        /* Receive the car new speed to decide whether it needs a change in throttle orientation or not*/
+        //xQueueReceive(Queue_Measurement, &enc_measurement, portMAX_DELAY);
+//#endif
+
         UART_sendString (UART0_BASE, "\n\r Measurement:  ");
         UART0_send_num_in_ASCII (_FTOI_I(enc_measurement));
         UART_sendString (UART0_BASE, ".");
